@@ -1,0 +1,110 @@
+/* Fond global avec overlay */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #ADD8E6; /* bleu ciel pâle */
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Overlay avec drapeau discret */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("drapeau.png"); /* ton fichier drapeau */
+  background-size: cover;       /* le drapeau couvre toute la page */
+  background-position: center;  /* centré */
+  background-repeat: no-repeat;
+  opacity: 0.15;                /* discrétion du drapeau */
+  z-index: -1;                  /* reste derrière le contenu */
+}
+
+/* En-tête institutionnel */
+header {
+  text-align: center;
+  margin: 20px 0;
+}
+header .ministere {
+  font-size: 2.8em;   /* grand caractère */
+  font-weight: bold;
+  text-transform: uppercase; /* majuscules */
+  color: #000080;     /* bleu foncé */
+  text-shadow: 2px 2px 4px white;
+  margin: 0;
+}
+header .direction {
+  font-size: 1.6em;   /* plus petit */
+  font-weight: normal;
+  color: #444444;     /* gris foncé */
+  text-shadow: 1px 1px 2px white;
+  margin: 0;
+}
+
+/* Titres et textes généraux */
+h2, h3, label, div, table {
+  color: #000080; /* bleu foncé pour contraste */
+  text-shadow: 1px 1px 2px white;
+}
+
+/* Formulaires */
+form {
+  background: rgba(255, 255, 255, 0.9); /* fond clair semi-transparent */
+  padding: 20px;
+  margin: 20px auto;
+  border-radius: 8px;
+  max-width: 400px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* Champs de saisie */
+input, select {
+  width: 95%;
+  padding: 8px;
+  margin: 5px 0 15px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Boutons principaux (jaune du drapeau) */
+button {
+  background-color: #FFD700; /* jaune vif */
+  color: black;
+  font-weight: bold;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #FF4500; /* rouge vif au survol */
+  color: white;
+}
+
+/* Tableaux */
+table {
+  width: 95%;
+  margin: 20px auto;
+  border-collapse: collapse;
+  background: rgba(255, 255, 255, 0.95);
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background-color: #1E90FF; /* bleu vif */
+  color: white;
+}
+td button {
+  background-color: #DC143C; /* rouge du drapeau */
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+td button:hover {
+  background-color: #8B0000; /* rouge foncé */
+}
+

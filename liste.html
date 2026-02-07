@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Suivi des problèmes</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- En-tête institutionnel -->
+  <header>
+    <h1 class="ministere">MINISTERE DE LA SANTE</h1>
+    <h2 class="direction">Direction des Ressources Humaines</h2>
+    <h3>Suivi des problèmes des agents</h3>
+  </header>
+
+  <!-- Boutons -->
+  <div style="margin:10px; text-align:center;">
+    <button id="logoutBtn"> Se déconnecter</button>
+    <a href="formulaire.html" id="addBtn"><button>FORMULAIRE</button></a>
+  </div>
+
+  <!-- Compteurs -->
+  <div id="compteur">Nombre d’agents avec problèmes : 0</div>
+  <div id="compteurResolus">Problèmes résolus : 0</div>
+  <div id="compteurNonTraites">Problèmes non traités : 0</div>
+  <div id="compteurEnCours">Problèmes en cours : 0</div>
+
+  <!-- Filtres -->
+  <div style="margin:10px; text-align:center;">
+    <label for="filtreEtat">Filtrer par état :</label>
+    <select id="filtreEtat">
+      <option value="">Tous</option>
+      <option value="déjà traité">Résolus</option>
+      <option value="traitement en cours">En cours</option>
+      <option value="non traité">Non traités</option>
+    </select>
+    <button id="applyFilter">🔍 Appliquer</button>
+  </div>
+
+  <!-- Tableau -->
+  <table id="tableProblemes">
+    <thead>
+      <tr>
+        <th>ID</th><th>Objet</th><th>Nom complet</th><th>Fonction</th><th>Grade</th>
+        <th>Date réception</th><th>N° enregistrement</th><th>Téléphone</th>
+        <th>Bureau du traitement</th><th>Division</th><th>Agent chargé de traiter</th>
+        <th>État d’avancement</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://ngsvrffgjksmmzyebptl.supabase.co";
+    const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    (async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        alert("Vous devez être connecté !");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // ----- Déconnexion -----
+      document.getElementById("logoutBtn").addEventListener("click", async () => {
+        await supabaseClient.auth.signOut();
+        alert("Vous êtes déconnecté !");
+        window.location.href = "login.html";
+      });
+
+      // ----- Vérifier rôle -----
+      const { data: roleData } = await supabaseClient
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .single();
+
+      let isSuperviseur = roleData && roleData.role === "superviseur";
+
+      // ----- Compteurs -----
+      async function fetchCount() {
+        const { count } = await supabaseClient
+          .from("problemes_agents")
+          .select("*", { count: "exact", head: true });
+        document.getElementById("compteur").textContent =
+          "Nombre d’agents avec problèmes : " + count;
+      }
+      async function fetchResolus() {
+        const { count } = await supabaseClient
+          .from("problemes_agents")
+          .select("*", { count: "exact", head: true })
+          .eq("etat_avancement", "déjà traité");
+        document.getElementById("compteurResolus").textContent =
+          "Problèmes résolus : " + count;
+      }
+      async function fetchNonTraites() {
+        const { count } = await supabaseClient
+          .from("problemes_agents")
+          .select("*", { count: "exact", head: true })
+          .eq("etat_avancement", "non traité");
+        document.getElementById("compteurNonTraites").textContent =
+          "Problèmes non traités : " + count;
+      }
+      async function fetchEnCours() {
+        const { count } = await supabaseClient
+          .from("problemes_agents")
+          .select("*", { count: "exact", head: true })
+          .eq("etat_avancement", "traitement en cours");
+        document.getElementById("compteurEnCours").textContent =
+          "Problèmes en cours : " + count;
+      }
+
+      async function fetchData(etatFiltre = "") {
+        let query = supabaseClient
+          .from("problemes_agents")
+          .select("*")
+          .order("id", { ascending: false });
+
+        if (etatFiltre) query = query.eq("etat_avancement", etatFiltre);
+
+        const { data, error } = await query;
+        if (error) { alert("Erreur : " + error.message); return; }
+
+        const tbody = document.querySelector("#tableProblemes tbody");
+        tbody.innerHTML = "";
+        (data || []).forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.id}</td>
+            <td>${row.objet || ""}</td>
+            <td>${row.nom_complet || ""}</td>
+            <td>${row.fonction || ""}</td>
+            <td>${row.grade || ""}</td>
+            <td>${row.date_reception || ""}</td>
+            <td>${row.numero_enregistrement || ""}</td>
+            <td>${row.telephone || ""}</td>
+            <td>${row.bureau_traitement || ""}</td>
+            <td>${row.division || ""}</td>
+            <td>${row.agent_charge_de_traiter || ""}</td>
+            <td>${row.etat_avancement || ""}</td>
+            <td>${isSuperviseur ? "" : `<button data-id="${row.id}" class="editBtn">✏️ Modifier</button>`}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        //  Mettre à jour les compteurs
+        fetchCount();
+        fetchResolus();
+        fetchNonTraites();
+        fetchEnCours();
+
+        //  Activer modification si pas superviseur
+        if (!isSuperviseur) {
+          document.querySelectorAll(".editBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+              const id = e.target.getAttribute("data-id");
+              window.location.href = `formulaire.html?id=${id}`;
+            });
+          });
+        }
+      }
+
+      // Charger au démarrage
+      fetchData();
+
+      // Bouton appliquer filtre
+      document.getElementById("applyFilter").addEventListener("click", () => {
+        const etatFiltre = document.getElementById("filtreEtat").value;
+        fetchData(etatFiltre);
+      });
+
+      // Masquer bouton Ajouter si superviseur
+      if (isSuperviseur) {
+        document.getElementById("addBtn").style.display = "none";
+      }
+    })();
+if (roleData && roleData.role === "superviseur") {
+  // Masquer bouton Ajouter
+  document.getElementById("addBtn").style.display = "none";
+
+  // Masquer boutons Modifier
+  document.querySelectorAll(".editBtn").forEach(btn => {
+    btn.style.display = "none";
+  });
+}
+
+  </script>
+</body>
+</html>
