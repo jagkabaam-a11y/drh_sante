@@ -2,53 +2,106 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Suivi des problèmes</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Registre des Dossiers - DRH MSP</title>
+  <style>
+    :root {
+      --primary: #000080;
+      --secondary: #FF4500;
+      --danger: #e74c3c;
+      --light-blue: #ADD8E6;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Arial, sans-serif; 
+      margin: 0; padding: 20px; 
+      background-color: var(--light-blue);
+    }
+
+    header { 
+      background-color: var(--primary); 
+      color: white; padding: 20px; 
+      border-radius: 10px; text-align: center; 
+      position: relative; margin-bottom: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    header h1 { font-size: 1.6em; margin: 0; }
+    header h2 { font-size: 1.1em; font-weight: normal; margin: 5px 0; }
+    header h3 { margin-top: 10px; color: #FFD700; text-transform: uppercase; }
+
+    #logoutBtn { 
+      position: absolute; right: 20px; top: 50%; 
+      transform: translateY(-50%); background-color: var(--danger); 
+      color: white; border: none; padding: 10px 18px; 
+      cursor: pointer; border-radius: 6px; font-weight: bold;
+    }
+
+    .search-bar { 
+      background: white; padding: 20px; border-radius: 10px;
+      display: flex; justify-content: center; gap: 10px;
+      margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .search-bar input { padding: 12px; width: 350px; border: 1px solid #ccc; border-radius: 8px; }
+    .search-bar button { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: white; }
+    #searchBtn { background-color: var(--primary); }
+    #resetBtn { background-color: #7f8c8d; }
+
+    .list-container { 
+      background: white; padding: 15px; border-radius: 10px;
+      overflow-x: auto; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    table { width: 100%; border-collapse: collapse; min-width: 1400px; }
+    table th { background-color: #2c3e50; color: white; padding: 12px; text-align: left; font-size: 0.85em; white-space: nowrap; }
+    table td { border: 1px solid #eee; padding: 10px; font-size: 0.85em; color: #333; }
+    table tr:nth-child(even) { background-color: #f9f9f9; }
+    table tr:hover { background-color: #f1f7ff; }
+
+    .link-scan { color: var(--primary); font-weight: bold; text-decoration: none; border-bottom: 1px solid var(--primary); }
+    .link-scan:hover { color: var(--secondary); border-bottom-color: var(--secondary); }
+  </style>
 </head>
 <body>
-  <!-- En-tête institutionnel -->
+
   <header>
-    <h1 class="ministere">MINISTERE DE LA SANTE</h1>
-    <h2 class="direction">Direction des Ressources Humaines</h2>
-    <h3>Suivi des problèmes des agents</h3>
+    <h1>MINISTERE DE LA SANTE PUBLIQUE</h1>
+    <h2>Direction des Ressources Humaines</h2>
+    <h3>REGISTRE GENERAL DES DOSSIERS</h3>
+    <button id="logoutBtn">Déconnexion</button>
   </header>
 
-  <!-- Boutons -->
-  <div style="margin:10px; text-align:center;">
-    <button id="logoutBtn"> Se déconnecter</button>
-    <a href="formulaire.html" id="addBtn"><button>FORMULAIRE</button></a>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Rechercher par nom ou N° enregistrement...">
+    <button id="searchBtn">🔍 Rechercher</button>
+    <button id="resetBtn">Réinitialiser</button>
   </div>
 
-  <!-- Compteurs -->
-  <div id="compteur">Nombre d’agents avec problèmes : 0</div>
-  <div id="compteurResolus">Problèmes résolus : 0</div>
-  <div id="compteurNonTraites">Problèmes non traités : 0</div>
-  <div id="compteurEnCours">Problèmes en cours : 0</div>
-
-  <!-- Filtres -->
-  <div style="margin:10px; text-align:center;">
-    <label for="filtreEtat">Filtrer par état :</label>
-    <select id="filtreEtat">
-      <option value="">Tous</option>
-      <option value="déjà traité">Résolus</option>
-      <option value="traitement en cours">En cours</option>
-      <option value="non traité">Non traités</option>
-    </select>
-    <button id="applyFilter">🔍 Appliquer</button>
+  <div class="list-container">
+    <table id="dossiersTable">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Objet</th>
+          <th>Nom complet</th>
+          <th>Fonction</th>
+          <th>Grade</th>
+          <th>Structure</th>
+          <th>Téléphone</th>
+          <th>N° enregistrement</th>
+          <th>Date arrivée</th>
+          <th>Division</th>
+          <th>Bureau traitement</th>
+          <th>Date sortie</th>
+          <th>Traitement / Transmission</th>
+          <th>Scan entrée</th>
+          <th>Scan sortie</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
   </div>
-
-  <!-- Tableau -->
-  <table id="tableProblemes">
-    <thead>
-      <tr>
-        <th>ID</th><th>Objet</th><th>Nom complet</th><th>Fonction</th><th>Grade</th>
-        <th>Date réception</th><th>N° enregistrement</th><th>Téléphone</th>
-        <th>Bureau du traitement</th><th>Division</th><th>Agent chargé de traiter</th>
-        <th>État d’avancement</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -56,137 +109,60 @@
     const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
     const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-    (async () => {
-      const { data: { user } } = await supabaseClient.auth.getUser();
-      if (!user) {
-        alert("Vous devez être connecté !");
-        window.location.href = "login.html";
-        return;
+    // Protection Session
+    if (!sessionStorage.getItem("role")) { window.location.href = "login.html"; }
+
+    document.getElementById("logoutBtn").onclick = () => {
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    };
+
+    async function chargerListe(filtre = null) {
+      let query = supabaseClient.from("problemes_agents").select("*").order("date_arrivee", { ascending: false });
+
+      if (filtre) {
+        query = query.or(`nom_complet.ilike.%${filtre}%,numero_enregistrement.ilike.%${filtre}%`);
       }
 
-      // ----- Déconnexion -----
-      document.getElementById("logoutBtn").addEventListener("click", async () => {
-        await supabaseClient.auth.signOut();
-        alert("Vous êtes déconnecté !");
-        window.location.href = "login.html";
+      const { data, error } = await query;
+      if (error) { alert("Erreur : " + error.message); return; }
+
+      const tbody = document.querySelector("#dossiersTable tbody");
+      tbody.innerHTML = "";
+      
+      data.forEach(d => {
+        const tr = document.createElement("tr");
+        
+        // Utilisation directe des URLs stockées en base (plus fiable)
+        const linkEntree = d.scan_entree_url ? `<a href="${d.scan_entree_url}" class="link-scan" target="_blank">📄 Voir Entrée</a>` : "-";
+        const linkSortie = d.scan_sortie_url ? `<a href="${d.scan_sortie_url}" class="link-scan" target="_blank">📄 Voir Sortie</a>` : "-";
+
+        tr.innerHTML = `
+          <td>${d.id || ""}</td>
+          <td>${d.objet || ""}</td>
+          <td>${d.nom_complet || ""}</td>
+          <td>${d.fonction || ""}</td>
+          <td>${d.grade || ""}</td>
+          <td>${d.structure || ""}</td>
+          <td>${d.telephone || ""}</td>
+          <td>${d.numero_enregistrement || ""}</td>
+          <td>${d.date_arrivee ? new Date(d.date_arrivee).toLocaleDateString() : ""}</td>
+          <td>${d.division || ""}</td>
+          <td>${d.bureau_traitement || ""}</td>
+          <td>${d.date_sortie ? new Date(d.date_sortie).toLocaleDateString() : ""}</td>
+          <td>${d.traitement_transmission || ""}</td>
+          <td>${linkEntree}</td>
+          <td>${linkSortie}</td>
+          <td>${d.statut || ""}</td>
+        `;
+        tbody.appendChild(tr);
       });
+    }
 
-      // ----- Vérifier rôle -----
-      const { data: roleData } = await supabaseClient
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .single();
+    document.getElementById("searchBtn").onclick = () => chargerListe(document.getElementById("searchInput").value.trim());
+    document.getElementById("resetBtn").onclick = () => { document.getElementById("searchInput").value = ""; chargerListe(); };
 
-      let isSuperviseur = roleData && roleData.role === "superviseur";
-
-      // ----- Compteurs -----
-      async function fetchCount() {
-        const { count } = await supabaseClient
-          .from("problemes_agents")
-          .select("*", { count: "exact", head: true });
-        document.getElementById("compteur").textContent =
-          "Nombre d’agents avec problèmes : " + count;
-      }
-      async function fetchResolus() {
-        const { count } = await supabaseClient
-          .from("problemes_agents")
-          .select("*", { count: "exact", head: true })
-          .eq("etat_avancement", "déjà traité");
-        document.getElementById("compteurResolus").textContent =
-          "Problèmes résolus : " + count;
-      }
-      async function fetchNonTraites() {
-        const { count } = await supabaseClient
-          .from("problemes_agents")
-          .select("*", { count: "exact", head: true })
-          .eq("etat_avancement", "non traité");
-        document.getElementById("compteurNonTraites").textContent =
-          "Problèmes non traités : " + count;
-      }
-      async function fetchEnCours() {
-        const { count } = await supabaseClient
-          .from("problemes_agents")
-          .select("*", { count: "exact", head: true })
-          .eq("etat_avancement", "traitement en cours");
-        document.getElementById("compteurEnCours").textContent =
-          "Problèmes en cours : " + count;
-      }
-
-      async function fetchData(etatFiltre = "") {
-        let query = supabaseClient
-          .from("problemes_agents")
-          .select("*")
-          .order("id", { ascending: false });
-
-        if (etatFiltre) query = query.eq("etat_avancement", etatFiltre);
-
-        const { data, error } = await query;
-        if (error) { alert("Erreur : " + error.message); return; }
-
-        const tbody = document.querySelector("#tableProblemes tbody");
-        tbody.innerHTML = "";
-        (data || []).forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.id}</td>
-            <td>${row.objet || ""}</td>
-            <td>${row.nom_complet || ""}</td>
-            <td>${row.fonction || ""}</td>
-            <td>${row.grade || ""}</td>
-            <td>${row.date_reception || ""}</td>
-            <td>${row.numero_enregistrement || ""}</td>
-            <td>${row.telephone || ""}</td>
-            <td>${row.bureau_traitement || ""}</td>
-            <td>${row.division || ""}</td>
-            <td>${row.agent_charge_de_traiter || ""}</td>
-            <td>${row.etat_avancement || ""}</td>
-            <td>${isSuperviseur ? "" : `<button data-id="${row.id}" class="editBtn">✏️ Modifier</button>`}</td>
-          `;
-          tbody.appendChild(tr);
-        });
-
-        //  Mettre à jour les compteurs
-        fetchCount();
-        fetchResolus();
-        fetchNonTraites();
-        fetchEnCours();
-
-        //  Activer modification si pas superviseur
-        if (!isSuperviseur) {
-          document.querySelectorAll(".editBtn").forEach(btn => {
-            btn.addEventListener("click", (e) => {
-              const id = e.target.getAttribute("data-id");
-              window.location.href = `formulaire.html?id=${id}`;
-            });
-          });
-        }
-      }
-
-      // Charger au démarrage
-      fetchData();
-
-      // Bouton appliquer filtre
-      document.getElementById("applyFilter").addEventListener("click", () => {
-        const etatFiltre = document.getElementById("filtreEtat").value;
-        fetchData(etatFiltre);
-      });
-
-      // Masquer bouton Ajouter si superviseur
-      if (isSuperviseur) {
-        document.getElementById("addBtn").style.display = "none";
-      }
-    })();
-if (roleData && roleData.role === "superviseur") {
-  // Masquer bouton Ajouter
-  document.getElementById("addBtn").style.display = "none";
-
-  // Masquer boutons Modifier
-  document.querySelectorAll(".editBtn").forEach(btn => {
-    btn.style.display = "none";
-  });
-}
-
+    chargerListe();
   </script>
 </body>
 </html>

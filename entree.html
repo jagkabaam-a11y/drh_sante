@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Entrée du dossier - DRH MSP</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; background: #ADD8E6; margin: 0; padding: 20px; }
+    .form-container { 
+      background: white; padding: 25px; border-radius: 12px; 
+      max-width: 600px; margin: 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    }
+    header { text-align: center; color: #000080; }
+    #autocompleteList { 
+      border:1px solid #ccc; max-height:150px; overflow-y:auto; 
+      position:absolute; background:#fff; width:100%; max-width:550px; z-index: 100; 
+    }
+    #autocompleteList div { padding:10px; cursor:pointer; border-bottom: 1px solid #eee; }
+    #autocompleteList div:hover { background:#f0f0f0; }
+    input, select, textarea { width: 100%; padding: 10px; margin: 8px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+    .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+    button { flex: 1; padding: 12px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; }
+    #saveButton { background: #28a745; }
+    #editButton { background: #ffc107; color: black; }
+    
+    /* Style pour l'aperçu du document */
+    #preview { 
+      margin-top:15px; width: 100%; border:2px dashed #ddd; 
+      border-radius: 8px; min-height: 80px; display: flex; 
+      align-items: center; justify-content: center; background: #fafafa;
+      overflow: hidden;
+    }
+    #status { 
+      margin-top:10px; padding: 12px; border-radius: 5px; 
+      text-align: center; display: none; font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 class="ministere">MINISTERE DE LA SANTE</h1>
+    <h2 class="direction">Direction des Ressources Humaines</h2>
+    <h3>FORMULAIRE D'ENTRÉE DU DOSSIER</h3>
+  </header>
+
+  <div class="form-container">
+    <label>Rechercher un dossier existant :</label>
+    <input type="text" id="searchInput" placeholder="Nom ou N° enregistrement...">
+    <div id="autocompleteList"></div>
+
+    <form id="entreeForm">
+      <input id="numero_enregistrement" placeholder="N° enregistrement" required>
+      <input id="objet" placeholder="Objet / Motif du dossier" required>
+      <input id="nom_complet" placeholder="Nom complet de l'agent" required>
+      <input id="fonction" placeholder="Fonction">
+      <input id="grade" placeholder="Grade">
+      <input id="structure" placeholder="Structure / Province">
+      <input id="telephone" placeholder="Téléphone de contact">
+      
+      <select id="statut" required>
+        <option value="nouveau_dossier">Nouveau dossier</option>
+        <option value="ancien_dossier">Ancien dossier (Complément)</option>
+      </select>
+
+      <label>Scanner le document (PDF ou Image) :</label>
+      <input type="file" id="scanFile" accept="application/pdf,image/*">
+      
+      <div id="preview">Aucun fichier sélectionné</div>
+
+      <div id="status"></div>
+
+      <div class="btn-group">
+        <button type="submit" id="saveButton">Enregistrer le dossier et le scan</button>
+        <button type="button" id="editButton" style="display:none;">Mettre à jour (Données + Scan)</button>
+      </div>
+      
+      <div style="text-align: center; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
+        <a href="liste.html" style="color: #000080; font-weight: bold; text-decoration: none;"> Registre Général des dossiers</a>
+      </div>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="utils.js"></script>
+  <script src="entree.js"></script>
+</body>
+</html>

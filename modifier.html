@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Modifier un dossier</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- En-tête institutionnel -->
+  <header>
+    <h1 class="ministere">MINISTERE DE LA SANTE</h1>
+    <h2 class="direction">Direction des Ressources Humaines</h2>
+    <h3>MODIFICATION DU DOSSIER</h3>
+  </header>
+
+  <div class="form-container">
+    <form id="modifierForm">
+      <label for="objet">Objet :</label>
+      <input type="text" id="objet" required>
+
+      <label for="nom_complet">Nom complet :</label>
+      <input type="text" id="nom_complet" required>
+
+      <label for="fonction">Fonction :</label>
+      <input type="text" id="fonction">
+
+      <label for="grade">Grade :</label>
+      <input type="text" id="grade">
+
+      <label for="structure">Structure :</label>
+      <input type="text" id="structure">
+
+      <label for="telephone">Téléphone :</label>
+      <input type="text" id="telephone">
+
+      <label for="numero_enregistrement">N° enregistrement :</label>
+      <input type="text" id="numero_enregistrement" required>
+
+      <button type="submit">Enregistrer modifications</button>
+      <a href="liste.html"> Retour à la liste</a>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://ngsvrffgjksmmzyebptl.supabase.co";
+    const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Récupère l'ID du dossier depuis l'URL
+    const params = new URLSearchParams(window.location.search);
+    const dossierId = params.get("id");
+
+    (async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        alert("Vous devez être connecté !");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Charger le dossier existant
+      const { data, error } = await supabaseClient
+        .from("problemes_agents")
+        .select("*")
+        .eq("id", dossierId)
+        .single();
+
+      if (error || !data) {
+        alert("Erreur lors du chargement du dossier : " + (error?.message || "Introuvable"));
+        window.location.href = "liste.html";
+        return;
+      }
+
+      // Pré-remplir le formulaire
+      document.getElementById("objet").value = data.objet || "";
+      document.getElementById("nom_complet").value = data.nom_complet || "";
+      document.getElementById("fonction").value = data.fonction || "";
+      document.getElementById("grade").value = data.grade || "";
+      document.getElementById("structure").value = data.structure || "";
+      document.getElementById("telephone").value = data.telephone || "";
+      document.getElementById("numero_enregistrement").value = data.numero_enregistrement || "";
+            // Soumission des modifications
+      document.getElementById("modifierForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const payload = {
+          objet: document.getElementById("objet").value.trim(),
+          nom_complet: document.getElementById("nom_complet").value.trim(),
+          fonction: document.getElementById("fonction").value.trim(),
+          grade: document.getElementById("grade").value.trim(),
+          structure: document.getElementById("structure").value.trim(),
+          telephone: document.getElementById("telephone").value.trim(),
+          numero_enregistrement: document.getElementById("numero_enregistrement").value.trim(),         
+          user_id: user.id
+        };
+
+        const { error } = await supabaseClient
+          .from("problemes_agents")
+          .update(payload)
+          .eq("id", dossierId);
+
+        if (error) {
+          alert("Erreur : " + error.message);
+        } else {
+          alert("Modifications enregistrées avec succès !");
+          window.location.href = "liste.html";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

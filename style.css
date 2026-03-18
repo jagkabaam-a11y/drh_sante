@@ -1,110 +1,186 @@
-/* Fond global avec overlay */
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background-color: #ADD8E6; /* bleu ciel pâle */
-  position: relative;
-  min-height: 100vh;
-}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration - DRH Ministère de la Santé</title>
+  <style>
+    /* --- VOTRE STYLE INSTITUTIONNEL --- */
+    body {
+      margin: 0; font-family: Arial, sans-serif; background-color: #ADD8E6;
+      position: relative; min-height: 100vh;
+    }
+    body::before {
+      content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("drapeau.png"); background-size: cover;
+      background-position: center; opacity: 0.15; z-index: -1;
+    }
+    header { text-align: center; margin: 20px 0; }
+    header .ministere { font-size: 2.5em; font-weight: bold; color: #000080; text-shadow: 2px 2px 4px white; }
+    
+    .form-container { max-width: 500px; margin: 0 auto; padding: 10px; }
+    form { background: rgba(255, 255, 255, 0.9); padding: 25px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.3); }
+    
+    label { color: #000080; font-weight: bold; display: block; margin: 10px 0 5px 0; }
+    input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
 
-/* Overlay avec drapeau discret */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-image: url("drapeau.png"); /* ton fichier drapeau */
-  background-size: cover;       /* le drapeau couvre toute la page */
-  background-position: center;  /* centré */
-  background-repeat: no-repeat;
-  opacity: 0.15;                /* discrétion du drapeau */
-  z-index: -1;                  /* reste derrière le contenu */
-}
+    /* --- GESTION DE L'OEIL ET VALIDATION --- */
+    .password-wrapper { position: relative; width: 100%; }
+    .password-wrapper input { padding-right: 45px; }
+    .toggle-password {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; font-size: 1.2em; color: #000080; z-index: 5;
+    }
 
-/* En-tête institutionnel */
-header {
-  text-align: center;
-  margin: 20px 0;
-}
-header .ministere {
-  font-size: 2.8em;   /* grand caractère */
-  font-weight: bold;
-  text-transform: uppercase; /* majuscules */
-  color: #000080;     /* bleu foncé */
-  text-shadow: 2px 2px 4px white;
-  margin: 0;
-}
-header .direction {
-  font-size: 1.6em;   /* plus petit */
-  font-weight: normal;
-  color: #444444;     /* gris foncé */
-  text-shadow: 1px 1px 2px white;
-  margin: 0;
-}
+    /* Indicateur de correspondance */
+    .match-error { border: 2px solid #ff4d4d !important; background-color: #fff2f2; }
+    .match-success { border: 2px solid #2eb82e !important; background-color: #f2fff2; }
 
-/* Titres et textes généraux */
-h2, h3, label, div, table {
-  color: #000080; /* bleu foncé pour contraste */
-  text-shadow: 1px 1px 2px white;
-}
+    button {
+      width: 100%; background-color: #FFD700; color: black; font-weight: bold;
+      border: none; padding: 12px; border-radius: 5px; cursor: pointer; margin-top: 20px;
+    }
+    button:disabled { background-color: #ccc; cursor: not-allowed; }
+    button:hover:not(:disabled) { background-color: #FF4500; color: white; }
 
-/* Formulaires */
-form {
-  background: rgba(255, 255, 255, 0.9); /* fond clair semi-transparent */
-  padding: 20px;
-  margin: 20px auto;
-  border-radius: 8px;
-  max-width: 400px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-}
+    table { width: 100%; margin-top: 20px; border-collapse: collapse; background: white; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    th { background-color: #1E90FF; color: white; }
+  </style>
+</head>
+<body>
 
-/* Champs de saisie */
-input, select {
-  width: 95%;
-  padding: 8px;
-  margin: 5px 0 15px 0;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
+  <header>
+    <div class="ministere">MINISTÈRE DE LA SANTÉ PUBLIQUE</div>
+    <div class="direction" style="font-size: 1.4em; color: #444;">Direction des Ressources Humaines</div>
+    <h3 style="color: #000080;">PANNEAU DE CONFIGURATION DES COMPTES</h3>
+  </header>
 
-/* Boutons principaux (jaune du drapeau) */
-button {
-  background-color: #FFD700; /* jaune vif */
-  color: black;
-  font-weight: bold;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-button:hover {
-  background-color: #FF4500; /* rouge vif au survol */
-  color: white;
-}
+  <div class="form-container">
+    <form id="adminForm">
+      <label>Email de l'agent :</label>
+      <input type="email" id="email" placeholder="nom.prenom@sante.gouv.cd" required>
 
-/* Tableaux */
-table {
-  width: 95%;
-  margin: 20px auto;
-  border-collapse: collapse;
-  background: rgba(255, 255, 255, 0.95);
-}
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
-}
-th {
-  background-color: #1E90FF; /* bleu vif */
-  color: white;
-}
-td button {
-  background-color: #DC143C; /* rouge du drapeau */
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-}
-td button:hover {
-  background-color: #8B0000; /* rouge foncé */
-}
+      <label>Mot de passe :</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="6 caractères min." required>
+        <span class="toggle-password" onclick="toggleVisibility('password')">👁️</span>
+      </div>
 
+      <label>Confirmer Mot de passe :</label>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" placeholder="Répéter le mot de passe" required>
+        <span class="toggle-password" onclick="toggleVisibility('confirmPassword')">👁️</span>
+      </div>
+      <small id="passwordHelp" style="display:block; margin-top:5px; font-weight:bold;"></small>
+
+      <label>Rôle attribué :</label>
+      <select id="userRole" required>
+        <option value="">-- Sélectionner le rôle --</option>
+        <option value="admin">Administrateur</option>
+        <option value="entree">Entrée (Saisie)</option>
+        <option value="dispatcher1">Dispatcher 1 (Direction)</option>
+        <option value="dispatcher2">Dispatcher 2 (Division)</option>
+        <option value="sortie">Sortie (Finalisation)</option>
+      </select>
+
+      <button type="submit" id="submitBtn">CRÉER LE COMPTE AGENT</button>
+      <div id="message" style="margin-top: 15px; text-align: center; font-weight: bold;"></div>
+    </form>
+
+    <div id="userListContainer"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = supabase.createClient("https://ngsvrffgjksmmzyebptl.supabase.co", "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5");
+
+    const passInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const submitBtn = document.getElementById('submitBtn');
+    const helpText = document.getElementById('passwordHelp');
+
+    // 1. VOIR/CACHER LE MOT DE PASSE
+    function toggleVisibility(id) {
+      const input = document.getElementById(id);
+      const icon = input.nextElementSibling;
+      input.type = (input.type === "password") ? "text" : "password";
+      icon.innerText = (input.type === "password") ? "👁️" : "🙈";
+    }
+
+    // 2. VÉRIFICATION EN TEMPS RÉEL DE LA CORRESPONDANCE
+    function validatePasswords() {
+      const p = passInput.value;
+      const cp = confirmInput.value;
+
+      if (cp.length > 0) {
+        if (p === cp) {
+          confirmInput.className = "match-success";
+          helpText.innerText = "✅ Les mots de passe correspondent";
+          helpText.style.color = "green";
+          submitBtn.disabled = false;
+        } else {
+          confirmInput.className = "match-error";
+          helpText.innerText = "❌ Les mots de passe sont différents";
+          helpText.style.color = "red";
+          submitBtn.disabled = true;
+        }
+      }
+    }
+
+    passInput.addEventListener('input', validatePasswords);
+    confirmInput.addEventListener('input', validatePasswords);
+
+    // 3. LOGIQUE DE CRÉATION
+    document.getElementById("adminForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.toLowerCase().trim();
+      const password = passInput.value;
+      const role = document.getElementById("userRole").value;
+
+      document.getElementById("message").innerText = "⏳ Création...";
+      
+      try {
+        const { data, error: authError } = await supabaseClient.auth.signUp({ email, password });
+        if (authError) throw authError;
+
+        await new Promise(res => setTimeout(res, 1000));
+
+        const { error: roleError } = await supabaseClient.from('user_roles').upsert([{ 
+          user_id: data.user.id, role, email 
+        }]);
+        if (roleError) throw roleError;
+
+        document.getElementById("message").innerText = "✅ Compte créé avec succès !";
+        document.getElementById("message").style.color = "green";
+        document.getElementById("adminForm").reset();
+        confirmInput.className = "";
+        helpText.innerText = "";
+        fetchUsers();
+      } catch (err) {
+        document.getElementById("message").innerText = "❌ " + err.message;
+        document.getElementById("message").style.color = "red";
+      }
+    };
+
+    async function fetchUsers() {
+      const { data, error } = await supabaseClient.from('user_roles').select('*').order('role');
+      if (error) return;
+      let html = '<table><tr><th>Email</th><th>Rôle</th><th>Action</th></tr>';
+      data.forEach(u => {
+        html += `<tr><td>${u.email}</td><td><b>${u.role.toUpperCase()}</b></td><td><button onclick="deleteU('${u.user_id}')" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">Supprimer</button></td></tr>`;
+      });
+      document.getElementById("userListContainer").innerHTML = html + '</table>';
+    }
+
+    async function deleteU(id) {
+      if(confirm("Supprimer cet accès ?")) {
+        await supabaseClient.from('user_roles').delete().eq('user_id', id);
+        fetchUsers();
+      }
+    }
+
+    fetchUsers();
+  </script>
+</body>
+</html>

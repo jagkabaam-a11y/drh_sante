@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration DRH - Ministère de la Santé</title>
+  <style>
+    /* --- STYLE GLOBAL ET FOND --- */
+    body {
+      margin: 0; font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: #ADD8E6; position: relative; min-height: 100vh;
+    }
+    body::before {
+      content: ""; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background-image: url("drapeau.png"); background-size: cover;
+      background-position: center; opacity: 0.15; z-index: -1;
+    }
+
+    /* --- BARRE SUPÉRIEURE --- */
+    .top-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 15px 30px;
+      background: rgba(0, 0, 128, 0.1);
+      gap: 15px;
+    }
+    .nav-btn-reporting {
+      background-color: #FFD700; color: #000080; border: none;
+      padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;
+      transition: 0.3s;
+    }
+    .nav-btn-reporting:hover { background-color: #e6c200; transform: scale(1.05); }
+    
+    .logout-btn {
+      background-color: #DC143C; color: white; border: none;
+      padding: 8px 18px; border-radius: 5px; font-weight: bold; cursor: pointer;
+      transition: 0.3s;
+    }
+    .logout-btn:hover { background-color: #8B0000; transform: scale(1.05); }
+
+    header { text-align: center; padding: 10px 0 25px 0; }
+    header .ministere { font-size: 2.4em; font-weight: bold; color: #000080; text-transform: uppercase; text-shadow: 2px 2px 4px white; margin: 0; }
+    header .direction { font-size: 1.4em; color: #444; margin-top: 5px; }
+
+    /* --- CONTENEUR ET FORMULAIRE --- */
+    .container { max-width: 650px; margin: 0 auto; padding: 20px; }
+    
+    form { 
+      background: rgba(255, 255, 255, 0.95); padding: 35px; 
+      border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.25); 
+    }
+
+    h3 { color: #000080; text-align: center; border-bottom: 2px solid #FFD700; padding-bottom: 10px; margin-bottom: 25px; }
+    label { color: #000080; font-weight: bold; display: block; margin: 15px 0 5px 0; }
+    input, select { 
+      width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 15px;
+    }
+
+    /* --- ŒIL ET MOT DE PASSE --- */
+    .password-wrapper { position: relative; width: 100%; }
+    .password-wrapper input { padding-right: 45px; }
+    .toggle-password {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; font-size: 1.3em; color: #000080; z-index: 5;
+    }
+
+    #submitBtn {
+      width: 100%; background-color: #000080; color: white; font-weight: bold;
+      border: none; padding: 15px; border-radius: 6px; cursor: pointer; 
+      margin-top: 25px; font-size: 16px; transition: 0.3s;
+    }
+    #submitBtn:hover { background-color: #FF4500; }
+    #submitBtn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+    hr {
+      margin: 50px 0; border: 0; height: 2px;
+      background-image: linear-gradient(to right, transparent, #000080, transparent);
+    }
+
+    /* --- TABLEAU DES AGENTS --- */
+    .list-title { text-align: center; color: #000080; text-transform: uppercase; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+    th { background-color: #1E90FF; color: white; }
+    .btn-delete { background: #DC143C; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; }
+    .btn-delete:hover { background: #8B0000; }
+  </style>
+</head>
+<body>
+
+  <script>
+    if (sessionStorage.getItem("role") !== "admin") {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <div class="top-bar">
+    <button class="nav-btn-reporting" onclick="window.location.href='reporting.html'">📊 Consulter Reporting</button>
+    <button class="logout-btn" onclick="handleLogout()">Se Déconnecter</button>
+  </div>
+
+  <header>
+    <div class="ministere">MINISTÈRE DE LA SANTÉ PUBLIQUE</div>
+    <div class="direction">Direction des Ressources Humaines</div>
+  </header>
+
+  <div class="container">
+    <form id="adminForm">
+      <h3>GESTION DES ACCÈS AGENTS</h3>
+      
+      <label>E-mail professionnel :</label>
+      <input type="email" id="email" placeholder="agent@sante.gouv.cd" required>
+
+      <label>Mot de passe :</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" required>
+        <span class="toggle-password" onclick="toggleVis('password')">👁️</span>
+      </div>
+
+      <label>Confirmer le mot de passe :</label>
+      <div class="password-wrapper">
+        <input type="password" id="confirmPassword" required>
+        <span class="toggle-password" onclick="toggleVis('confirmPassword')">👁️</span>
+      </div>
+
+      <label>Rôle attribué :</label>
+      <select id="userRole" required>
+        <option value="">-- Sélectionner un rôle --</option>
+        <option value="admin">Administrateur</option>
+        <option value="entree">Entrée (Saisie)</option>
+        <option value="dispatcher1">Dispatcher 1 (Direction)</option>
+        <option value="dispatcher2">Dispatcher 2 (Division)</option>
+        <option value="sortie">Sortie (Finalisation)</option>
+      </select>
+
+      <button type="submit" id="submitBtn">CRÉER LE COMPTE AGENT</button>
+      <div id="msg" style="margin-top: 15px; text-align: center; font-weight: bold;"></div>
+    </form>
+
+    <hr>
+
+    <h4 class="list-title">Agents Actifs dans le Système</h4>
+    <div id="userListContainer"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient = supabase.createClient(
+      "https://ngsvrffgjksmmzyebptl.supabase.co", 
+      "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5"
+    );
+
+    async function handleLogout() {
+      await supabaseClient.auth.signOut();
+      sessionStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    function toggleVis(id) {
+      const el = document.getElementById(id);
+      el.type = el.type === "password" ? "text" : "password";
+    }
+
+    // --- CRÉATION DE COMPTE ---
+    document.getElementById("adminForm").onsubmit = async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.toLowerCase().trim();
+      const password = document.getElementById("password").value;
+      const confirm = document.getElementById("confirmPassword").value;
+      const role = document.getElementById("userRole").value;
+      const msg = document.getElementById("msg");
+
+      if (password !== confirm) {
+        msg.innerText = "❌ Mots de passe différents !";
+        msg.style.color = "red";
+        return;
+      }
+
+      msg.innerText = "⏳ Création du compte...";
+      document.getElementById("submitBtn").disabled = true;
+
+      try {
+        const { data, error } = await supabaseClient.auth.signUp({ email, password });
+        if (error) throw error;
+
+        // Pause pour s'assurer que l'utilisateur auth est créé avant l'insertion du rôle
+        await new Promise(res => setTimeout(res, 2000));
+
+        const { error: dbErr } = await supabaseClient
+          .from('user_roles')
+          .insert([{ user_id: data.user.id, email: email, role: role }]);
+
+        if (dbErr) throw dbErr;
+
+        msg.innerText = "✅ Utilisateur créé avec succès !";
+        msg.style.color = "green";
+        document.getElementById("adminForm").reset();
+        fetchUsers(); // Actualiser la liste
+      } catch (err) {
+        msg.innerText = "❌ " + err.message;
+        msg.style.color = "red";
+      } finally {
+        document.getElementById("submitBtn").disabled = false;
+      }
+    };
+
+    // --- RÉCUPÉRATION ET AFFICHAGE DU TABLEAU DES AGENTS ---
+    async function fetchUsers() {
+      const container = document.getElementById("userListContainer");
+      container.innerHTML = "<p style='text-align:center;'>Chargement des agents...</p>";
+      
+      const { data, error } = await supabaseClient.from('user_roles').select('*').order('email');
+      
+      if (error) {
+        container.innerHTML = "<p style='color:red; text-align:center;'>Erreur de chargement des agents.</p>";
+        return;
+      }
+
+      if (data.length === 0) {
+        container.innerHTML = "<p style='text-align:center;'>Aucun agent trouvé.</p>";
+        return;
+      }
+
+      let html = '<table><tr><th>Email</th><th>Rôle</th><th>Action</th></tr>';
+      data.forEach(u => {
+        html += `<tr>
+          <td>${u.email}</td>
+          <td><b>${u.role.toUpperCase()}</b></td>
+          <td><button class="btn-delete" onclick="del('${u.id}')">Supprimer</button></td>
+        </tr>`;
+      });
+      container.innerHTML = html + '</table>';
+    }
+
+    // --- SUPPRESSION D'UN AGENT ---
+    async function del(id) {
+      if(confirm("Attention : Supprimer cet accès retirera les droits de l'agent. Continuer ?")) {
+        const { error } = await supabaseClient.from('user_roles').delete().eq('id', id);
+        if (error) {
+          alert("Erreur lors de la suppression : " + error.message);
+        } else {
+          fetchUsers();
+        }
+      }
+    }
+
+    // Lancement au chargement de la page
+    fetchUsers();
+  </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Reporting Admin</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Librairies pour export PDF/Excel -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    .charts-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .chart-box {
+      width: 400px;
+      height: 300px;
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+      /* Correction : centrer le contenu */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      max-width: 100%;
+      max-height: 100%;
+    }
+    .nav-buttons {
+      text-align: center;
+      margin-top: 80px; /* espace plus grand pour ne pas gêner les légendes */
+    }
+    .nav-buttons button {
+      margin: 5px;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+    }
+    .nav-buttons button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Vérification accès administrateur -->
+  <script>
+    if (sessionStorage.getItem("reportingAuth") !== "true") {
+      alert("Accès réservé à l'administrateur !");
+      window.location.href = "reporting_login.html";
+    }
+  </script>
+
+  <!-- En-tête institutionnel -->
+  <header>
+    <h1 class="ministere">MINISTERE DE LA SANTE</h1>
+    <h2 class="direction">Direction des Ressources Humaines</h2>
+    <h3>REPORTING ADMIN</h3>
+  </header>
+
+  <!-- Graphiques -->
+  <div class="charts-container">
+    <div class="chart-box">
+      <h4>Dossiers par statut</h4>
+      <canvas id="chartStatut"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h4>Dossiers par bureau de traitement</h4>
+      <canvas id="chartBureau"></canvas>
+    </div>
+
+    <div class="chart-box">
+      <h4>Dossiers par mois</h4>
+      <canvas id="chartMois"></canvas>
+    </div>
+  </div>
+
+  <!-- Boutons navigation et export -->
+  <div class="nav-buttons">
+    <button onclick="window.location.href='liste.html'">⬅ Retour à la liste</button>
+    <button id="exportPDF"> Exporter en PDF</button>
+    <button id="exportExcel">📊 Exporter en Excel</button>
+    <button id="logout"> Déconnexion</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://ngsvrffgjksmmzyebptl.supabase.co";
+    const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    let chartStatut, chartBureau, chartMois;
+
+    (async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (!user) {
+        alert("Vous devez être connecté !");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Graphique par statut
+      const { data: dataStatut } = await supabaseClient.from("reporting_problemes").select("*");
+      if (dataStatut) {
+        chartStatut = new Chart(document.getElementById("chartStatut"), {
+          type: "bar",
+          data: {
+            labels: dataStatut.map(d => d.statut),
+            datasets: [{
+              label: "Nombre de dossiers",
+              data: dataStatut.map(d => d.total),
+              backgroundColor: ["#007bff","#ffc107","#28a745","#dc3545","#6c757d"]
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+
+      // Graphique par bureau
+      const { data: dataBureau } = await supabaseClient.from("reporting_par_bureau").select("*");
+      if (dataBureau) {
+        chartBureau = new Chart(document.getElementById("chartBureau"), {
+          type: "pie",
+          data: {
+            labels: dataBureau.map(d => d.bureau_traitement),
+            datasets: [{
+              label: "Nombre de dossiers",
+              data: dataBureau.map(d => d.total),
+              backgroundColor: ["#007bff","#ffc107","#28a745","#dc3545","#6c757d"]
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+
+      // Graphique par mois
+      const { data: dataMois } = await supabaseClient.from("reporting_par_mois").select("*");
+      if (dataMois) {
+        chartMois = new Chart(document.getElementById("chartMois"), {
+          type: "line",
+          data: {
+            labels: dataMois.map(d => d.mois),
+            datasets: [{
+              label: "Entrées par mois",
+              data: dataMois.map(d => d.total),
+              borderColor: "#007bff",
+              fill: false
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+
+      // Export PDF avec tableaux + graphiques
+      document.getElementById("exportPDF").addEventListener("click", async () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("Reporting Admin - Ministère de la Santé", 10, 10);
+
+        if (dataStatut) doc.autoTable({ head: [["Statut", "Total"]], body: dataStatut.map(d => [d.statut, d.total]) });
+        if (chartStatut) doc.addImage(chartStatut.toBase64Image(), "PNG", 15, doc.lastAutoTable.finalY + 10, 180, 100);
+
+        if (dataBureau) doc.autoTable({ head: [["Bureau", "Total"]], body: dataBureau.map(d => [d.bureau_traitement, d.total]) });
+        if (chartBureau) doc.addImage(chartBureau.toBase64Image(), "PNG", 15, doc.lastAutoTable.finalY + 10, 180, 100);
+
+        if (dataMois) doc.autoTable({ head: [["Mois", "Total"]], body: dataMois.map(d => [d.mois, d.total]) });
+        if (chartMois) doc.addImage(chartMois.toBase64Image(), "PNG", 15, doc.lastAutoTable.finalY + 10, 180, 100);
+
+        doc.save("reporting_admin.pdf");
+      });
+
+      // Export Excel
+      document.getElementById("exportExcel").addEventListener("click", async () => {
+        const wb = XLSX.utils.book_new();
+        if (dataStatut) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataStatut), "Par Statut");
+        if (dataBureau) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataBureau), "Par Bureau");
+        if (dataMois) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataMois), "Par Mois");
+        XLSX.writeFile(wb, "reporting_admin.xlsx");
+      });
+
+      // Déconnexion
+      document.getElementById("logout").addEventListener("click", () => {
+        sessionStorage.removeItem("reportingAuth");
+        alert("Vous êtes déconnecté !");
+        window.location.href = "reporting_login.html";
+      });
+    })();
+  </script>
+</body>
+</html>

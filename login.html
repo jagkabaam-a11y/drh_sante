@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion - DRH MSP</title>
+  <style>
+    body { 
+      font-family: 'Segoe UI', sans-serif; 
+      background: #ADD8E6; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      margin: 0; 
+    }
+    .form-container { 
+      background: white; 
+      padding: 30px; 
+      border-radius: 12px; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+      width: 350px; 
+    }
+    h1 { color: #000080; font-size: 1.4em; text-align: center; margin-bottom: 5px; }
+    h2 { color: #444; font-size: 1em; text-align: center; margin-bottom: 20px; font-weight: normal; }
+    label { font-weight: bold; font-size: 0.9em; color: #333; }
+    input { 
+      width: 100%; 
+      padding: 12px; 
+      margin: 8px 0 18px 0; 
+      border: 1px solid #ccc; 
+      border-radius: 6px; 
+      box-sizing: border-box; 
+    }
+    button { 
+      width: 100%; 
+      padding: 12px; 
+      background: #000080; 
+      color: white; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: bold; 
+      font-size: 16px;
+    }
+    button:hover { background: #FF4500; }
+    button:disabled { background: #cccccc; cursor: not-allowed; }
+    #msg { color: red; text-align: center; margin-top: 15px; font-size: 0.9em; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>MINISTÈRE DE LA SANTÉ PUBLIQUE</h1>
+    <h2>Direction des Ressources Humaines</h2>
+  </header>
+
+  <div class="form-container">
+    <form id="loginForm">
+      <label>Email professionnel</label>
+      <input type="email" id="email" required placeholder="nom@sante.gouv.cd">
+
+      <label>Mot de passe</label>
+      <input type="password" id="password" required placeholder="••••••••">
+
+      <button type="submit" id="btnConnecter">Se connecter</button>
+    </form>
+    <div id="msg"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseUrl = "https://ngsvrffgjksmmzyebptl.supabase.co";
+    const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const msg = document.getElementById("msg");
+      const btn = document.getElementById("btnConnecter");
+
+      // État de chargement
+      btn.disabled = true;
+      btn.innerText = "Vérification...";
+      msg.innerText = "";
+
+      try {
+        // 1. Authentification de l'utilisateur
+        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password,
+        });
+
+        if (authError) throw authError;
+
+        // 2. Récupération du rôle dans la table user_roles
+        const { data: roleData, error: roleError } = await supabaseClient
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        if (roleError || !roleData) {
+          await supabaseClient.auth.signOut();
+          throw new Error("Accès refusé : Aucun rôle DRH attribué à ce compte.");
+        }
+
+        const userRole = roleData.role;
+
+        // 3. Stockage du rôle pour la session (utilisé par dispatcher.html)
+        sessionStorage.setItem("role", userRole);
+
+        // 4. LOGIQUE DE REDIRECTION VERS LES FICHIERS SPÉCIFIQUES
+        console.log("Rôle détecté :", userRole);
+
+        if (userRole === "admin") {
+          window.location.href = "admin.html";
+        } 
+        else if (userRole === "entree") {
+          window.location.href = "entree.html";
+        } 
+        else if (userRole === "sortie") {
+          window.location.href = "sortie.html";
+        } 
+        else if (userRole === "dispatcher1" || userRole === "dispatcher2") {
+          // Les deux types de dispatchers vont sur le même fichier
+          window.location.href = "dispatcher.html";
+        } 
+        else {
+          msg.innerText = "Erreur : Rôle non reconnu par le système.";
+          btn.disabled = false;
+          btn.innerText = "Se connecter";
+        }
+
+      } catch (err) {
+        msg.innerText = err.message === "Invalid login credentials" 
+          ? "Email ou mot de passe incorrect." 
+          : err.message;
+        btn.disabled = false;
+        btn.innerText = "Se connecter";
+      }
+    });
+  </script>
+</body>
+</html>
