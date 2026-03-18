@@ -1,0 +1,12 @@
+# Configuration pour supprimer les extensions .html
+[build.processing]
+  skip_processing = false
+[build.processing.html]
+  pretty_urls = true
+
+# Redirection optionnelle pour forcer le chargement sans .html
+[[redirects]]
+  from = "/login.html"
+  to = "/login"
+  status = 301
+  force = true
