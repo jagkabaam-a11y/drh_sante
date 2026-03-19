@@ -2,147 +2,245 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Connexion - DRH MSP</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion | DRH - Ministère de la Santé</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { 
-      font-family: 'Segoe UI', sans-serif; 
-      background: #ADD8E6; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: center; 
-      min-height: 100vh; 
-      margin: 0; 
+    :root {
+      --primary-color: #000080; /* Bleu Nuit */
+      --accent-color: #FF4500;  /* Orange Médical */
+      --bg-light: #f4f7f9;
+      --text-dark: #333;
     }
-    .form-container { 
-      background: white; 
-      padding: 30px; 
-      border-radius: 12px; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-      width: 350px; 
+
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(135deg, #ADD8E6 0%, #87CEEB 100%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      position: relative;
+      overflow: hidden; /* Empêche le défilement dû aux images flottantes */
     }
-    h1 { color: #000080; font-size: 1.4em; text-align: center; margin-bottom: 5px; }
-    h2 { color: #444; font-size: 1em; text-align: center; margin-bottom: 20px; font-weight: normal; }
-    label { font-weight: bold; font-size: 0.9em; color: #333; }
-    input { 
-      width: 100%; 
-      padding: 12px; 
-      margin: 8px 0 18px 0; 
-      border: 1px solid #ccc; 
-      border-radius: 6px; 
-      box-sizing: border-box; 
+
+    /* --- ÉLÉMENTS FLOTTANTS D'ARRIÈRE-PLAN --- */
+    .floating-bg {
+      position: absolute;
+      font-size: 20rem;
+      color: var(--primary-color);
+      opacity: 0.05; /* Très léger pour l'élégance */
+      z-index: 0;
+      pointer-events: none;
+      user-select: none;
     }
-    button { 
-      width: 100%; 
-      padding: 12px; 
-      background: #000080; 
-      color: white; 
-      border: none; 
-      border-radius: 6px; 
-      cursor: pointer; 
-      font-weight: bold; 
-      font-size: 16px;
+
+    .bg-left { bottom: -50px; left: -50px; transform: rotate(-15deg); }
+    .bg-right { top: -50px; right: -50px; transform: rotate(15deg); }
+
+    /* --- CARTE DE CONNEXION --- */
+    .login-card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      z-index: 10; /* Devant les images flottantes */
     }
-    button:hover { background: #FF4500; }
-    button:disabled { background: #cccccc; cursor: not-allowed; }
-    #msg { color: red; text-align: center; margin-top: 15px; font-size: 0.9em; font-weight: bold; }
+
+    .logo-placeholder {
+      width: 80px;
+      height: 80px;
+      background: var(--bg-light);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 20px;
+      color: var(--primary-color);
+      font-size: 2.5em;
+    }
+
+    h1 { color: var(--primary-color); font-size: 1.4rem; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
+    h2 { color: #666; font-size: 0.9rem; margin-bottom: 30px; font-weight: 400; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+
+    .input-group {
+      text-align: left;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-dark);
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 38px;
+      color: var(--primary-color);
+      opacity: 0.6;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 12px 12px 12px 42px;
+      border: 2px solid #e1e1e1;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .input-group input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+      box-shadow: 0 0 8px rgba(0,0,128,0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1rem;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover { background: var(--accent-color); transform: translateY(-2px); }
+    button:active { transform: translateY(0); }
+    button:disabled { background: #ccc; cursor: not-allowed; }
+
+    #msg {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: none;
+    }
+
+    .error-msg { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; display: block !important; }
+    .success-msg { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; display: block !important; }
+
+    .footer-text { margin-top: 25px; font-size: 0.7rem; color: #888; line-height: 1.4; }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>MINISTÈRE DE LA SANTÉ PUBLIQUE</h1>
-    <h2>Direction des Ressources Humaines</h2>
-  </header>
+<i class="fas fa-microscope floating-bg bg-left"></i>
+<i class="fas fa-hand-holding-medical floating-bg bg-right"></i>
 
-  <div class="form-container">
-    <form id="loginForm">
-      <label>Email professionnel</label>
-      <input type="email" id="email" required placeholder="nom@sante.gouv.cd">
-
-      <label>Mot de passe</label>
-      <input type="password" id="password" required placeholder="••••••••">
-
-      <button type="submit" id="btnConnecter">Se connecter</button>
-    </form>
-    <div id="msg"></div>
+<div class="login-card">
+  <div class="logo-placeholder">
+    <i class="fas fa-user-md"></i>
   </div>
+  
+  <h1>MINISTÈRE DE LA SANTÉ</h1>
+  <h2>Direction des Ressources Humaines</h2>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const supabaseUrl = "https://ngsvrffgjksmmzyebptl.supabase.co";
-    const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
-    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+  <form id="loginForm">
+    <div class="input-group">
+      <label>Email Professionnel</label>
+      <i class="fas fa-envelope"></i>
+      <input type="email" id="email" required placeholder="nom@sante.gouv.cd">
+    </div>
 
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const msg = document.getElementById("msg");
-      const btn = document.getElementById("btnConnecter");
+    <div class="input-group">
+      <label>Mot de Passe</label>
+      <i class="fas fa-lock"></i>
+      <input type="password" id="password" required placeholder="••••••••">
+    </div>
 
-      // État de chargement
-      btn.disabled = true;
-      btn.innerText = "Vérification...";
-      msg.innerText = "";
+    <button type="submit" id="btnConnecter">
+      <i class="fas fa-sign-in-alt"></i> Se connecter
+    </button>
+  </form>
 
-      try {
-        // 1. Authentification de l'utilisateur
-        const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-          email: email,
-          password: password,
-        });
+  <div id="msg"></div>
 
-        if (authError) throw authError;
+  <div class="footer-text">
+    &copy; 2026 Secrétariat Général à la Santé <br> 
+    Direction des Ressources Humaines <br>
+    République Démocratique du Congo
+  </div>
+</div>
 
-        // 2. Récupération du rôle dans la table user_roles
-        const { data: roleData, error: roleError } = await supabaseClient
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', authData.user.id)
-          .single();
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const supabaseUrl = "https://ngsvrffgjksmmzyebptl.supabase.co";
+  const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
+  const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-        if (roleError || !roleData) {
-          await supabaseClient.auth.signOut();
-          throw new Error("Accès refusé : Aucun rôle DRH attribué à ce compte.");
-        }
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const msg = document.getElementById("msg");
+    const btn = document.getElementById("btnConnecter");
 
-        const userRole = roleData.role;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
+    msg.className = "";
+    msg.innerText = "";
 
-        // 3. Stockage du rôle pour la session (utilisé par dispatcher.html)
-        sessionStorage.setItem("role", userRole);
+    try {
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password,
+      });
 
-        // 4. LOGIQUE DE REDIRECTION VERS LES FICHIERS SPÉCIFIQUES
-        console.log("Rôle détecté :", userRole);
+      if (authError) throw authError;
 
-        if (userRole === "admin") {
-          window.location.href = "admin.html";
-        } 
-        else if (userRole === "entree") {
-          window.location.href = "entree.html";
-        } 
-        else if (userRole === "sortie") {
-          window.location.href = "sortie.html";
-        } 
-        else if (userRole === "dispatcher1" || userRole === "dispatcher2") {
-          // Les deux types de dispatchers vont sur le même fichier
-          window.location.href = "dispatcher.html";
-        } 
-        else {
-          msg.innerText = "Erreur : Rôle non reconnu par le système.";
-          btn.disabled = false;
-          btn.innerText = "Se connecter";
-        }
+      const { data: roleData, error: roleError } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', authData.user.id)
+        .maybeSingle();
 
-      } catch (err) {
-        msg.innerText = err.message === "Invalid login credentials" 
-          ? "Email ou mot de passe incorrect." 
-          : err.message;
-        btn.disabled = false;
-        btn.innerText = "Se connecter";
+      if (roleError || !roleData) {
+        await supabaseClient.auth.signOut();
+        throw new Error("Accès refusé : Aucun rôle attribué à ce compte.");
       }
-    });
-  </script>
+
+      sessionStorage.setItem("role", roleData.role);
+      msg.className = "success-msg";
+      msg.innerText = "Connexion réussie ! Redirection...";
+
+      setTimeout(() => {
+        const routes = {
+          "admin": "admin.html",
+          "entree": "entree.html",
+          "sortie": "sortie.html",
+          "dispatcher1": "dispatcher.html",
+          "dispatcher2": "dispatcher.html"
+        };
+        window.location.href = routes[roleData.role] || "login.html";
+      }, 1000);
+
+    } catch (err) {
+      msg.className = "error-msg";
+      msg.innerText = err.message === "Invalid login credentials" 
+        ? "Email ou mot de passe incorrect." 
+        : err.message;
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+    }
+  });
+</script>
+
 </body>
 </html>
