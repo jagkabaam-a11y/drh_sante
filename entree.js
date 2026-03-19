@@ -18,7 +18,6 @@ let selectedDossier = null;
   if (!user) { location.href = "login.html"; return; }
 
   // --- FONCTION INTERNE POUR L'UPLOAD ---
-  // Cette fonction gère l'envoi et récupère l'URL publique complète
   async function traiterUpload(numero) {
     const file = document.getElementById("scanFile").files[0];
     if (!file) return null; 
@@ -36,7 +35,7 @@ let selectedDossier = null;
       .from("scans")
       .getPublicUrl(filePath);
 
-    return publicLink.publicUrl; // Retourne l'URL complète : https://...
+    return publicLink.publicUrl;
   }
 
   // --- RECHERCHE AUTO-COMPLÉTION ---
@@ -60,7 +59,6 @@ let selectedDossier = null;
           list.innerHTML = "";
           document.getElementById("searchInput").value = div.textContent;
           
-          // Remplissage des champs
           document.getElementById("objet").value = d.objet || "";
           document.getElementById("nom_complet").value = d.nom_complet || "";
           document.getElementById("fonction").value = d.fonction || "";
@@ -78,7 +76,7 @@ let selectedDossier = null;
     }
   });
 
-  // --- VISUALISATION DU DOCUMENT AVANT ENVOI ---
+  // --- VISUALISATION DU DOCUMENT ---
   document.getElementById("scanFile").addEventListener("change", e => {
     const preview = document.getElementById("preview");
     const file = e.target.files[0];
@@ -101,7 +99,7 @@ let selectedDossier = null;
     }
   });
 
-  // --- ACTION : ENREGISTRER (NOUVEAU) ---
+  // --- ACTION : ENREGISTRER (NOUVEAU) - CORRIGÉ ---
   document.getElementById("entreeForm").onsubmit = async e => {
     e.preventDefault();
     const statusDiv = document.getElementById("status");
@@ -122,9 +120,8 @@ let selectedDossier = null;
         telephone: document.getElementById("telephone").value,
         statut: document.getElementById("statut").value,
         date_arrivee: new Date().toISOString(),
-        scan_entree_url: scanUrl,
-        dernier_bureau: "Entrée",
-        etat_avancement: "Réceptionné"
+        scan_entree_url: scanUrl
+        // 'dernier_bureau' et 'etat_avancement' ont été supprimés pour éviter l'erreur de schéma
       };
 
       const { error } = await supabaseClient.from("problemes_agents").insert([payload]);
@@ -160,7 +157,6 @@ let selectedDossier = null;
         statut: document.getElementById("statut").value
       };
 
-      // On met à jour l'URL seulement si un nouveau fichier a été choisi
       if (scanUrl) payload.scan_entree_url = scanUrl;
 
       const { error } = await supabaseClient.from("problemes_agents")
