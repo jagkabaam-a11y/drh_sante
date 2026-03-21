@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Connexion | DRH - Ministère de la Santé</title>
+  <title>Portail DRH | Ministère de la Santé - RDC</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     :root {
@@ -11,132 +11,65 @@
       --accent-color: #FF4500;  /* Orange Médical */
       --bg-light: #f4f7f9;
       --text-dark: #333;
+      --success: #2e7d32;
     }
 
     body {
       font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: linear-gradient(135deg, #ADD8E6 0%, #87CEEB 100%);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      margin: 0;
-      position: relative;
-      overflow: hidden; /* Empêche le défilement dû aux images flottantes */
+      display: flex; justify-content: center; align-items: center;
+      min-height: 100vh; margin: 0; position: relative; overflow-x: hidden;
     }
 
-    /* --- ÉLÉMENTS FLOTTANTS D'ARRIÈRE-PLAN --- */
-    .floating-bg {
-      position: absolute;
-      font-size: 20rem;
-      color: var(--primary-color);
-      opacity: 0.05; /* Très léger pour l'élégance */
-      z-index: 0;
-      pointer-events: none;
-      user-select: none;
+    /* --- ÉLÉMENTS FLOTTANTS --- */
+    .floating-bg { position: absolute; font-size: 15rem; color: var(--primary-color); opacity: 0.04; z-index: 0; pointer-events: none; }
+    .bg-left { bottom: -50px; left: -50px; transform: rotate(-20deg); }
+    .bg-right { top: -50px; right: -50px; transform: rotate(20deg); }
+
+    /* --- CARTE PRINCIPALE --- */
+    .main-card {
+      background: white; padding: 30px; border-radius: 16px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2); width: 100%; max-width: 420px;
+      text-align: center; position: relative; z-index: 10;
     }
 
-    .bg-left { bottom: -50px; left: -50px; transform: rotate(-15deg); }
-    .bg-right { top: -50px; right: -50px; transform: rotate(15deg); }
+    .logo-container { width: 90px; height: 90px; margin: 0 auto 15px; }
+    .logo-official { max-width: 100%; object-fit: contain; }
 
-    /* --- CARTE DE CONNEXION --- */
-    .login-card {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-      position: relative;
-      z-index: 10; /* Devant les images flottantes */
+    h1 { color: var(--primary-color); font-size: 1.2rem; margin: 5px 0; text-transform: uppercase; }
+    h2 { color: #666; font-size: 0.85rem; margin-bottom: 20px; font-weight: 400; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+    /* --- ONGLETS (TABS) --- */
+    .tab-container { display: flex; margin-bottom: 20px; background: #eee; border-radius: 8px; padding: 4px; }
+    .tab { flex: 1; padding: 10px; cursor: pointer; border-radius: 6px; font-size: 0.85rem; font-weight: 600; color: #666; transition: 0.3s; }
+    .tab.active { background: var(--primary-color); color: white; }
+
+    /* --- FORMULAIRES --- */
+    .form-section { display: none; }
+    .form-section.active { display: block; animation: fadeIn 0.4s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .input-group { text-align: left; margin-bottom: 15px; position: relative; }
+    .input-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.8rem; color: var(--text-dark); }
+    .input-group i { position: absolute; left: 15px; top: 35px; color: var(--primary-color); opacity: 0.6; }
+    .input-group input { width: 100%; padding: 10px 10px 10px 42px; border: 2px solid #e1e1e1; border-radius: 8px; box-sizing: border-box; }
+    
+    button { width: 100%; padding: 12px; background: var(--primary-color); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+    button:hover { background: var(--accent-color); }
+    .btn-search { background: var(--success); }
+
+    /* --- AFFICHAGE RÉSULTAT RECHERCHE --- */
+    #searchResult { 
+      margin-top: 20px; padding: 15px; border-radius: 8px; text-align: left; 
+      font-size: 0.85rem; display: none; border: 1px solid #ddd; background: #fafafa;
     }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-weight: bold; color: white; margin-top: 5px; }
 
-    .logo-placeholder {
-      width: 80px;
-      height: 80px;
-      background: var(--bg-light);
-      border-radius: 50%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0 auto 20px;
-      color: var(--primary-color);
-      font-size: 2.5em;
-    }
+    #msg { margin-top: 15px; font-size: 0.8rem; display: none; padding: 8px; border-radius: 5px; }
+    .error-msg { background: #ffebee; color: #c62828; display: block !important; }
+    .success-msg { background: #e8f5e9; color: #2e7d32; display: block !important; }
 
-    h1 { color: var(--primary-color); font-size: 1.4rem; margin: 10px 0; text-transform: uppercase; letter-spacing: 1px; }
-    h2 { color: #666; font-size: 0.9rem; margin-bottom: 30px; font-weight: 400; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-
-    .input-group {
-      text-align: left;
-      margin-bottom: 20px;
-      position: relative;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--text-dark);
-    }
-
-    .input-group i {
-      position: absolute;
-      left: 15px;
-      top: 38px;
-      color: var(--primary-color);
-      opacity: 0.6;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px 12px 12px 42px;
-      border: 2px solid #e1e1e1;
-      border-radius: 8px;
-      box-sizing: border-box;
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-
-    .input-group input:focus {
-      border-color: var(--primary-color);
-      outline: none;
-      box-shadow: 0 0 8px rgba(0,0,128,0.1);
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      background: var(--primary-color);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      font-size: 1rem;
-      transition: all 0.3s;
-      margin-top: 10px;
-    }
-
-    button:hover { background: var(--accent-color); transform: translateY(-2px); }
-    button:active { transform: translateY(0); }
-    button:disabled { background: #ccc; cursor: not-allowed; }
-
-    #msg {
-      margin-top: 20px;
-      padding: 10px;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      display: none;
-    }
-
-    .error-msg { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; display: block !important; }
-    .success-msg { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; display: block !important; }
-
-    .footer-text { margin-top: 25px; font-size: 0.7rem; color: #888; line-height: 1.4; }
+    .footer-text { margin-top: 20px; font-size: 0.65rem; color: #888; }
   </style>
 </head>
 <body>
@@ -144,37 +77,51 @@
 <i class="fas fa-microscope floating-bg bg-left"></i>
 <i class="fas fa-hand-holding-medical floating-bg bg-right"></i>
 
-<div class="login-card">
-  <div class="logo-placeholder">
-    <i class="fas fa-user-md"></i>
+<div class="main-card">
+  <div class="logo-container">
+    <img src="images/logo_sante_rdc.png" alt="Logo Officiel RDC" class="logo-official">
   </div>
   
   <h1>MINISTÈRE DE LA SANTÉ</h1>
   <h2>Direction des Ressources Humaines</h2>
 
-  <form id="loginForm">
-    <div class="input-group">
-      <label>Email Professionnel</label>
-      <i class="fas fa-envelope"></i>
-      <input type="email" id="email" required placeholder="nom@sante.gouv.cd">
-    </div>
+  <div class="tab-container">
+    <div class="tab active" onclick="switchTab('login')"><i class="fas fa-lock"></i> Agent DRH</div>
+    <div class="tab" onclick="switchTab('search')"><i class="fas fa-search"></i> Suivre mon dossier</div>
+  </div>
 
-    <div class="input-group">
-      <label>Mot de Passe</label>
-      <i class="fas fa-lock"></i>
-      <input type="password" id="password" required placeholder="••••••••">
-    </div>
+  <div id="loginSection" class="form-section active">
+    <form id="loginForm">
+      <div class="input-group">
+        <label>Email Professionnel</label>
+        <i class="fas fa-envelope"></i>
+        <input type="email" id="email" required placeholder="nom@sante.gouv.cd">
+      </div>
+      <div class="input-group">
+        <label>Mot de Passe</label>
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" required placeholder="••••••••">
+      </div>
+      <button type="submit" id="btnConnecter">Se connecter</button>
+    </form>
+  </div>
 
-    <button type="submit" id="btnConnecter">
-      <i class="fas fa-sign-in-alt"></i> Se connecter
-    </button>
-  </form>
+  <div id="searchSection" class="form-section">
+    <p style="font-size: 0.8rem; color: #666; margin-bottom: 15px;">Saisissez votre numéro d'enregistrement pour vérifier le statut de votre dossier.</p>
+    <div class="input-group">
+      <label>Numéro d'Enregistrement</label>
+      <i class="fas fa-file-invoice"></i>
+      <input type="text" id="searchNum" placeholder="Ex: DRH/2026/001">
+    </div>
+    <button type="button" class="btn-search" onclick="publicSearch()">Vérifier le statut</button>
+    
+    <div id="searchResult"></div>
+  </div>
 
   <div id="msg"></div>
 
   <div class="footer-text">
     &copy; 2026 Secrétariat Général à la Santé <br> 
-    Direction des Ressources Humaines <br>
     République Démocratique du Congo
   </div>
 </div>
@@ -185,6 +132,66 @@
   const supabaseKey = "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5";
   const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
+  // GESTION DES ONGLETS
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('msg').className = ""; document.getElementById('msg').innerText = "";
+
+    if(tab === 'login') {
+      document.querySelectorAll('.tab')[0].classList.add('active');
+      document.getElementById('loginSection').classList.add('active');
+    } else {
+      document.querySelectorAll('.tab')[1].classList.add('active');
+      document.getElementById('searchSection').classList.add('active');
+    }
+  }
+
+  // RECHERCHE PUBLIQUE SANS COMPTE
+  async function publicSearch() {
+    const num = document.getElementById("searchNum").value.trim();
+    const resultDiv = document.getElementById("searchResult");
+    if(!num) return alert("Veuillez saisir un numéro.");
+
+    resultDiv.style.display = "none";
+    resultDiv.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Recherche en cours...';
+    resultDiv.style.display = "block";
+
+    const { data, error } = await supabaseClient
+      .from('problemes_agents')
+      .select('nom_complet, statut, bureau_traitement, date_arrivee')
+      .eq('numero_enregistrement', num)
+      .maybeSingle();
+
+    if (error) {
+      resultDiv.innerHTML = "<span style='color:red;'>Erreur lors de la recherche.</span>";
+    } else if (!data) {
+      resultDiv.innerHTML = "<span style='color:red;'><i class='fas fa-exclamation-triangle'></i> Aucun dossier trouvé pour ce numéro.</span>";
+    } else {
+      // Définition des couleurs de badge selon le statut
+      const statusColors = {
+        "nouveau_dossier": "#3498db",
+        "en_cours": "#f39c12",
+        "Terminé": "#27ae60",
+        "Sortie": "#27ae60"
+      };
+      const badgeColor = statusColors[data.statut] || "#95a5a6";
+
+      resultDiv.innerHTML = `
+        <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 5px;">
+          <b>Agent :</b> ${data.nom_complet}
+        </div>
+        <div><b>Reçu le :</b> ${data.date_arrivee}</div>
+        <div><b>Bureau actuel :</b> ${data.bureau_traitement || "Non assigné"}</div>
+        <div style="margin-top:10px;">
+          <b>Statut actuel :</b><br>
+          <span class="status-badge" style="background:${badgeColor}">${data.statut.replace('_', ' ').toUpperCase()}</span>
+        </div>
+      `;
+    }
+  }
+
+  // SCRIPT DE LOGIN EXISTANT (INCHANGÉ)
   document.getElementById("loginForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value.trim();
@@ -193,51 +200,33 @@
     const btn = document.getElementById("btnConnecter");
 
     btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vérification...';
-    msg.className = "";
-    msg.innerText = "";
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>...';
 
     try {
-      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-        email: email,
-        password: password,
-      });
-
+      const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (authError) throw authError;
 
-      const { data: roleData, error: roleError } = await supabaseClient
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', authData.user.id)
-        .maybeSingle();
+      const { data: roleData } = await supabaseClient.from('user_roles').select('role').eq('user_id', authData.user.id).maybeSingle();
 
-      if (roleError || !roleData) {
+      if (!roleData) {
         await supabaseClient.auth.signOut();
-        throw new Error("Accès refusé : Aucun rôle attribué à ce compte.");
+        throw new Error("Accès refusé : Aucun rôle attribué.");
       }
 
       sessionStorage.setItem("role", roleData.role);
       msg.className = "success-msg";
-      msg.innerText = "Connexion réussie ! Redirection...";
+      msg.innerText = "Connexion réussie !";
 
       setTimeout(() => {
-        const routes = {
-          "admin": "admin.html",
-          "entree": "entree.html",
-          "sortie": "sortie.html",
-          "dispatcher1": "dispatcher.html",
-          "dispatcher2": "dispatcher.html"
-        };
+        const routes = { "admin": "admin.html", "entree": "entree.html", "sortie": "sortie.html", "dispatcher1": "dispatcher.html", "dispatcher2": "dispatcher.html" };
         window.location.href = routes[roleData.role] || "login.html";
       }, 1000);
 
     } catch (err) {
       msg.className = "error-msg";
-      msg.innerText = err.message === "Invalid login credentials" 
-        ? "Email ou mot de passe incorrect." 
-        : err.message;
+      msg.innerText = err.message === "Invalid login credentials" ? "Email ou mot de passe incorrect." : err.message;
       btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Se connecter';
+      btn.innerHTML = 'Se connecter';
     }
   });
 </script>
