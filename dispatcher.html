@@ -30,10 +30,9 @@
       border-radius: 15px; 
       box-shadow: 0 20px 50px rgba(0,0,0,0.3); 
       border-top: 10px solid var(--primary);
-      position: relative; /* Pour positionner le bouton logout */
+      position: relative;
     }
 
-    /* Bouton Déconnexion */
     #logoutBtn {
       position: absolute;
       right: 20px;
@@ -48,184 +47,97 @@
       transition: 0.3s;
     }
 
-    #logoutBtn:hover {
-      background-color: #c0392b;
-      transform: scale(1.05);
-    }
-
-    header { 
-      text-align: center; 
-      border-bottom: 3px double #ccc; 
-      margin-bottom: 30px; 
-      padding-bottom: 20px;
-    }
-
+    header { text-align: center; border-bottom: 3px double #ccc; margin-bottom: 30px; padding-bottom: 20px; }
     .ministere { color: var(--primary); font-size: 1.8em; font-weight: bold; margin: 0; }
     .direction { color: #333; font-size: 1.3em; margin: 5px 0; border-bottom: 3px solid var(--gold); display: inline-block; }
     .page-title { color: var(--secondary); font-weight: bold; margin-top: 15px; font-size: 1.2em; text-transform: uppercase; }
 
-    .search-box { 
-      background: #f0f7ff; 
-      padding: 35px; 
-      border-radius: 12px; 
-      margin-bottom: 30px; 
-      border: 2px solid var(--primary);
-    }
-
-    .search-box label {
-      display: block;
-      margin-bottom: 15px;
-      font-weight: bold;
-      font-size: 1.4em;
-      color: var(--primary);
-    }
-
-    input[type="text"] { 
-      width: 100%; 
-      padding: 22px; 
-      border: 2px solid #aaa; 
-      border-radius: 10px; 
-      font-size: 1.5em; 
-      box-sizing: border-box;
-      background: white;
-      box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .btn-search { 
-      width: 100%; 
-      padding: 20px; 
-      background: var(--primary); 
-      color: white; 
-      border: none;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 1.3em;
-      cursor: pointer;
-      margin-top: 15px;
-      transition: background 0.3s;
-    }
-
-    .btn-search:hover { background: var(--secondary); }
-
-    .result-item { 
-      background: white; 
-      padding: 20px; 
-      margin-top: 15px; 
-      border: 1px solid #ddd; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center; 
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-    }
-
-    .btn-select { 
-      background: var(--success); 
-      color: white; 
-      padding: 12px 25px; 
-      border: none; 
-      border-radius: 8px; 
-      font-weight: bold; 
-      cursor: pointer;
-    }
-
-    #assignZone { 
-      display: none; 
-      margin-top: 35px; 
-      padding: 35px; 
-      border: 4px solid var(--gold); 
-      border-radius: 15px; 
-      background: #fff;
-    }
-
-    .agent-summary {
-      background: #eef4ff;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 25px;
-      border-left: 10px solid var(--primary);
-    }
-
-    select { 
-      width: 100%; 
-      padding: 20px; 
-      border-radius: 10px; 
-      border: 2px solid #ccc; 
-      font-size: 1.3em;
-      margin-top: 10px;
-      background: #fff;
-    }
-
-    .btn-save { 
-      width: 100%; 
-      background: var(--success); 
-      color: white; 
-      padding: 22px; 
-      margin-top: 30px; 
-      font-size: 1.5em; 
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
-    }
+    .search-box { background: #f0f7ff; padding: 35px; border-radius: 12px; margin-bottom: 30px; border: 2px solid var(--primary); }
+    input[type="text"] { width: 100%; padding: 20px; border: 2px solid #aaa; border-radius: 10px; font-size: 1.3em; box-sizing: border-box; }
+    
+    .btn-search { width: 100%; padding: 18px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; font-size: 1.2em; cursor: pointer; margin-top: 15px; }
+    .result-item { background: white; padding: 20px; margin-top: 15px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; border-radius: 10px; }
+    
+    #assignZone { display: none; margin-top: 35px; padding: 35px; border: 4px solid var(--gold); border-radius: 15px; background: #fff; }
+    .agent-summary { background: #eef4ff; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 10px solid var(--primary); }
+    
+    select { width: 100%; padding: 18px; border-radius: 10px; border: 2px solid #ccc; font-size: 1.2em; margin-top: 10px; }
+    .btn-save { width: 100%; background: var(--success); color: white; padding: 20px; margin-top: 30px; font-size: 1.4em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <button id="logoutBtn">Déconnexion </button>
+  <button id="logoutBtn">Déconnexion</button>
 
   <header>
     <p style="font-weight: bold; margin: 0; color: #555;">REPUBLIQUE DEMOCRATIQUE DU CONGO</p>
     <h1 class="ministere">MINISTERE DE LA SANTE PUBLIQUE</h1>
     <h2 class="direction">Direction des Ressources Humaines</h2>
-    <div class="page-title" id="titrePage">GESTION DES AFFECTATIONS</div>
+    <div class="page-title" id="titrePage">CIRCUIT INTERNE DES DOSSIERS</div>
     <p id="infoRole" style="margin-top: 12px; font-weight: bold; color: var(--primary);"></p>
   </header>
 
   <div class="search-box">
-    <label for="searchInput">🔍 RECHERCHE DE DOSSIER:</label>
-    <input type="text" id="searchInput" placeholder="Nom de l'agent ou Numéro d'enregistrement...">
-    <button class="btn-search" onclick="rechercherDossier()">RECHERCHE</button>
+    <label>🔍 RECHERCHE (Nom, Matricule ou N° Enregistrement):</label>
+    <input type="text" id="searchInput" placeholder="Saisir les informations de l'agent...">
+    <button class="btn-search" onclick="rechercherDossier()">LANCER LA RECHERCHE</button>
     <div id="results"></div>
   </div>
 
   <div id="assignZone">
     <div class="agent-summary">
-      <strong style="color:var(--primary); font-size: 0.9em;">DOSSIER EN COURS :</strong> <br>
-      <span id="agentNom" style="font-size: 1.6em; font-weight: bold;"></span> <br>
-      <span style="font-size: 1.1em;">N° d'enregistrement : <b id="agentNum"></b></span>
+      <strong style="color:var(--primary);">DOSSIER SÉLECTIONNÉ :</strong> <br>
+      <span id="agentNom" style="font-size: 1.5em; font-weight: bold;"></span> <br>
+      <span style="font-size: 1.1em;">Registre N° : <b id="agentNum"></b></span>
     </div>
 
     <form id="dispatchForm">
       <div id="divD1" style="display:none;">
-        <label><b>AFFECTER À LA DIVISION :</b></label>
-        <select id="fieldDivision">
-          <option value="">-- Choisir la Division --</option>
-          <option value="Division Capital Humain">Division Capital Humain</option>
-          <option value="Division Action Sociale">Division Action Sociale</option>
-          <option value="Division Gestion et Développement des Compétences">Division Gestion et Développement des Compétences</option>
-          <option value="Secrétariat de la Direction">Secrétariat de la Direction</option>
+        <label><b>ORIENTATION DU DOSSIER :</b></label>
+        <select id="actionD1">
+          <option value="">-- Choisir une action --</option>
+          <optgroup label="DESCENDRE (Affectation)">
+            <option value="VERS_DIVISION">Envoyer à une Division</option>
+          </optgroup>
+          <optgroup label="RECEPTIONNER (Fin de circuit interne)">
+            <option value="RECU_DIRECTION">Confirmer la réception finale à la Direction</option>
+          </optgroup>
         </select>
+
+        <div id="selectDiv" style="margin-top:15px; display:none;">
+          <label>Choisir la Division destinataire :</label>
+          <select id="fieldDivision">
+            <option value="">-- Choisir la Division --</option>
+            <option value="Division Capital Humain">Division Capital Humain</option>
+            <option value="Division Action Sociale">Division Action Sociale</option>
+            <option value="Division Gestion des Compétences">Division Gestion des Compétences</option>
+          </select>
+        </div>
       </div>
 
       <div id="divD2" style="display:none;">
-        <label><b>AFFECTER AU BUREAU DE TRAITEMENT :</b></label>
-        <select id="fieldBureau">
-          <option value="">-- Choisir le Bureau --</option>
-          <option value="Bureau Carrière Administrative">Bureau Carrière Administrative</option>
-          <option value="Bureau Carrière Prosante">Bureau Carrière Prosante</option>
-          <option value="Bureau Eléments Paie">Bureau Eléments Paie</option>
-          <option value="Bureau Qualité de vie">Bureau Qualité de vie</option>
-	  <option value="Bureau Assistance Sociale">Bureau Assistance Sociale</option>
-	  <option value="Bureau Relation Prof, Activités Cultureles Sport et Ludique">Bureau Relation Prof, Activités Cultureles Sport et Ludique</option>
-	  <option value="Bureau Gestion prévisionnelle des emplois">Bureau Gestion prévisionnelle des emplois</option>
- 	  <option value="Bureau Suivie et Evaluation des Compétences">Bureau Suivie et Evaluation des Compétences</option>
+        <label><b>MOUVEMENT DU DOSSIER :</b></label>
+        <select id="actionD2">
+          <option value="">-- Choisir une action --</option>
+          <optgroup label="DESCENDRE (Affectation)">
+            <option value="VERS_BUREAU">Affecter à un Bureau</option>
+          </optgroup>
+          <optgroup label="REMONTER (Retour vers Direction)">
+            <option value="RETOUR_DIVISION">Dossier traité : Remonter à la Division</option>
+            <option value="RETOUR_DIRECTION">Transmettre à la Direction (Sans passé par la Division)</option>
+          </optgroup>
         </select>
+
+        <div id="selectBur" style="margin-top:15px; display:none;">
+          <label>Choisir le Bureau de traitement :</label>
+          <select id="fieldBureau">
+            <option value="">-- Choisir le Bureau --</option>
+            </select>
+        </div>
       </div>
 
-      <button type="submit" class="btn-save"> VALIDER ET METTRE À JOUR LA LISTE</button>
+      <button type="submit" class="btn-save">VALIDER LE MOUVEMENT</button>
     </form>
   </div>
 </div>
@@ -237,36 +149,51 @@
   const role = sessionStorage.getItem("role");
   let currentDossierId = null;
 
-  if (!role) window.location.href = "login.html";
-  
-  document.getElementById("infoRole").innerText = "AGENT CONNECTÉ : " + role.toUpperCase();
+  // Configuration des bureaux par division
+  const bureauxParDivision = {
+    "Division Capital Humain": [
+      "Bureau Carrière Administrative",
+      "Bureau Carrière Prosante",
+      "Bureau Eléments Paie"
+    ],
+    "Division Action Sociale": [
+      "Bureau Qualité de vie", 
+      "Bureau Assistance Sociale",
+      "Bureau Relation Prof, Activités Culturelles"
+    ],
+    "Division Gestion des Compétences": [
+      "Bureau Gestion prévisionnelle des emplois",
+      "Bureau Suivie et Evaluation des Compétences"
+    ]
+  };
 
-  // Logique du bouton de déconnexion
-  document.getElementById("logoutBtn").addEventListener("click", async () => {
-    const confirmation = confirm("Voulez-vous vraiment vous déconnecter ?");
-    if (confirmation) {
-      await supabaseClient.auth.signOut();
-      sessionStorage.clear(); // On vide les rôles stockés
-      window.location.href = "login.html";
-    }
-  });
+  if (!role) window.location.href = "login.html";
+  document.getElementById("infoRole").innerText = "AGENT : " + role.toUpperCase();
 
   if (role === "dispatcher1") {
     document.getElementById("divD1").style.display = "block";
-    document.getElementById("titrePage").innerText = "DISPATCHING NIVEAU 1 (DIRECTION -> DIVISION)";
   } else if (role === "dispatcher2") {
     document.getElementById("divD2").style.display = "block";
-    document.getElementById("titrePage").innerText = "DISPATCHING NIVEAU 2 (DIVISION -> BUREAU)";
+  } else if (role === "admin") {
+    document.getElementById("divD1").style.display = "block";
+    document.getElementById("divD2").style.display = "block";
   }
 
-  async function rechercherDossier() {
-    const query = document.getElementById("searchInput").value.trim();
-    if(!query) return;
+  document.getElementById("actionD1")?.addEventListener("change", e => {
+    document.getElementById("selectDiv").style.display = (e.target.value === "VERS_DIVISION") ? "block" : "none";
+  });
+  document.getElementById("actionD2")?.addEventListener("change", e => {
+    document.getElementById("selectBur").style.display = (e.target.value === "VERS_BUREAU") ? "block" : "none";
+  });
 
-    const { data, error } = await supabaseClient
+  async function rechercherDossier() {
+    const q = document.getElementById("searchInput").value.trim();
+    if(!q) return;
+
+    const { data } = await supabaseClient
       .from("problemes_agents")
-      .select("id, nom_complet, numero_enregistrement")
-      .or(`nom_complet.ilike.%${query}%,numero_enregistrement.ilike.%${query}%`)
+      .select("*")
+      .or(`nom_complet.ilike.%${q}%,numero_enregistrement.ilike.%${q}%,matricule.ilike.%${q}%`)
       .limit(5);
 
     const resDiv = document.getElementById("results");
@@ -276,50 +203,78 @@
       data.forEach(d => {
         resDiv.innerHTML += `
           <div class="result-item">
-            <span><b style="font-size:1.3em">${d.nom_complet}</b> <br> Registre N° ${d.numero_enregistrement}</span>
+            <span><b>${d.nom_complet}</b> (Mat: ${d.matricule || 'N/A'})<br>Statut actuel: ${d.statut}</span>
             <button class="btn-select" onclick="ouvrirFormulaire('${d.id}', '${d.nom_complet}', '${d.numero_enregistrement}')">SÉLECTIONNER</button>
           </div>`;
       });
     } else {
-      resDiv.innerHTML = "<p style='color:red; font-weight:bold; padding:15px; text-align:center;'>Aucun dossier correspondant dans la base de données.</p>";
+      resDiv.innerHTML = "<p style='color:red; text-align:center;'>Aucun dossier trouvé.</p>";
     }
   }
 
-  function ouvrirFormulaire(id, nom, num) {
+  async function ouvrirFormulaire(id, nom, num) {
     currentDossierId = id;
     document.getElementById("agentNom").innerText = nom;
     document.getElementById("agentNum").innerText = num;
     document.getElementById("assignZone").style.display = "block";
     document.getElementById("results").innerHTML = "";
-    document.getElementById("assignZone").scrollIntoView({ behavior: 'smooth' });
+
+    // Filtrage dynamique des bureaux pour le Dispatcher 2
+    const { data } = await supabaseClient.from("problemes_agents").select("division").eq("id", id).single();
+    const selectBur = document.getElementById("fieldBureau");
+    selectBur.innerHTML = '<option value="">-- Choisir le Bureau --</option>';
+
+    if (data && data.division && bureauxParDivision[data.division]) {
+      bureauxParDivision[data.division].forEach(b => {
+        let opt = document.createElement("option");
+        opt.value = b; opt.textContent = b;
+        selectBur.appendChild(opt);
+      });
+    }
   }
 
   document.getElementById("dispatchForm").onsubmit = async (e) => {
     e.preventDefault();
-    let updates = { statut: "Affecté" };
+    let updates = {};
 
-    if (role === "dispatcher1") {
-      const val = document.getElementById("fieldDivision").value;
-      if (!val) return alert("Sélectionnez une division !");
-      updates.division = val;
-    } else {
-      const val = document.getElementById("fieldBureau").value;
-      if (!val) return alert("Sélectionnez un bureau !");
-      updates.bureau_traitement = val;
+    if (role === "dispatcher1" || role === "admin") {
+      const action = document.getElementById("actionD1").value;
+      if (action === "VERS_DIVISION") {
+        updates.division = document.getElementById("fieldDivision").value;
+        updates.statut = "En attente à la Division";
+      } else if (action === "RECU_DIRECTION") {
+        updates.statut = "Prêt pour transmission SG";
+      }
+    } 
+    
+    if (role === "dispatcher2" || role === "admin") {
+      const action = document.getElementById("actionD2").value;
+      if (action === "VERS_BUREAU") {
+        updates.bureau_traitement = document.getElementById("fieldBureau").value;
+        updates.statut = "En cours au Bureau";
+      } else if (action === "RETOUR_DIVISION") {
+        updates.statut = "Traité (Retour Division)";
+      } else if (action === "RETOUR_DIRECTION") {
+        updates.statut = "Transmis à la Direction";
+      }
     }
 
-    const { error } = await supabaseClient
-      .from("problemes_agents")
-      .update(updates)
-      .eq("id", currentDossierId);
+    if (Object.keys(updates).length === 0) return alert("Action requise !");
 
-    if (error) {
-      alert("Erreur technique : " + error.message);
-    } else {
-      alert("Dossier mis à jour avec succès dans le registre.");
-      window.location.href = "liste.html";
+    const { error } = await supabaseClient.from("problemes_agents").update(updates).eq("id", currentDossierId);
+
+    if (error) alert("Erreur : " + error.message);
+    else {
+      alert("Mouvement enregistré !");
+      window.location.reload();
     }
   };
+
+  document.getElementById("logoutBtn").addEventListener("click", () => {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+	
+  });
 </script>
 </body>
 </html>
