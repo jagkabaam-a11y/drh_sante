@@ -146,7 +146,23 @@
           <thead>
             <tr>
               <th class="sticky-col">Actions</th>
-              <th>ID</th><th>Objet</th><th>Nom complet</th><th>Fonction</th><th>Grade</th><th>Structure</th><th>Téléphone</th><th>N° enregistrement</th><th>Date arrivée</th><th>Division</th><th>Bureau traitement</th><th>Date sortie</th><th>Transmission</th><th>Scan Entrée</th><th>Scan Sortie</th><th>Statut</th>
+              <th>ID</th>
+              <th>Objet</th>
+              <th>Nom complet</th>
+              <th>Matricule</th>
+              <th>Fonction</th>
+              <th>Grade</th>
+              <th>Structure</th>
+              <th>Téléphone</th>
+              <th>N° enregistrement</th>
+              <th>Date arrivée</th>
+              <th>Division</th>
+              <th>Bureau traitement</th>
+              <th>Date sortie</th>
+              <th>Transmission</th>
+              <th>Scan Entrée</th>
+              <th>Scan Sortie</th>
+              <th>Statut</th>
             </tr>
           </thead>
           <tbody id="tableBody"></tbody>
@@ -175,7 +191,6 @@
       chargerDossiers();
     };
 
-    // FILTRAGE COMBINÉ (Texte + Dates)
     function filtrerRegistre() {
       const recherche = document.getElementById("search").value.toLowerCase();
       const debut = document.getElementById("dateDebut").value;
@@ -205,7 +220,6 @@
       calculerStats(dossiersCache);
     }
 
-    // EXPORT EXCEL
     function exporterVersExcel() {
       const recherche = document.getElementById("search").value.toLowerCase();
       const debut = document.getElementById("dateDebut").value;
@@ -222,7 +236,7 @@
       if (donneesAExporter.length === 0) { alert("Aucune donnée à exporter."); return; }
 
       const dataNettoyee = donneesAExporter.map(d => ({
-        "ID": d.id, "Objet": d.objet, "Nom Complet": d.nom_complet, "Fonction": d.fonction, "Grade": d.grade,
+        "ID": d.id, "Objet": d.objet, "Nom Complet": d.nom_complet, "Matricule": d.matricule, "Fonction": d.fonction, "Grade": d.grade,
         "Structure": d.structure, "Téléphone": d.telephone, "N° Enregistrement": d.numero_enregistrement,
         "Date Arrivée": d.date_arrivee, "Division": d.division, "Bureau": d.bureau_traitement,
         "Date Sortie": d.date_sortie, "Statut": d.statut
@@ -252,7 +266,23 @@
             <button class="btn-action btn-print" onclick="preparerImpression('${d.id}')" title="Imprimer"><i class="fas fa-print"></i></button>
             ${role === "admin" ? `<button class="btn-action btn-del" onclick="supprimerDossier('${d.id}')"><i class="fas fa-trash"></i></button>` : ""}
           </td>
-          <td>${d.id}</td><td>${d.objet || ""}</td><td><b>${d.nom_complet || ""}</b></td><td>${d.fonction || ""}</td><td>${d.grade || ""}</td><td>${d.structure || ""}</td><td>${d.telephone || ""}</td><td>${d.numero_enregistrement || ""}</td><td>${d.date_arrivee || ""}</td><td>${d.division || ""}</td><td>${d.bureau_traitement || ""}</td><td>${d.date_sortie || ""}</td><td>${d.traitement_transmission || ""}</td><td>${d.scan_entree_url ? "✅" : "-"}</td><td>${d.scan_sortie_url ? "✅" : "-"}</td><td><b>${d.statut || ""}</b></td>
+          <td>${d.id}</td>
+          <td>${d.objet || ""}</td>
+          <td><b>${d.nom_complet || ""}</b></td>
+          <td>${d.matricule || ""}</td>
+          <td>${d.fonction || ""}</td>
+          <td>${d.grade || ""}</td>
+          <td>${d.structure || ""}</td>
+          <td>${d.telephone || ""}</td>
+          <td>${d.numero_enregistrement || ""}</td>
+          <td>${d.date_arrivee || ""}</td>
+          <td>${d.division || ""}</td>
+          <td>${d.bureau_traitement || ""}</td>
+          <td>${d.date_sortie || ""}</td>
+          <td>${d.traitement_transmission || ""}</td>
+          <td>${d.scan_entree_url ? "✅" : "-"}</td>
+          <td>${d.scan_sortie_url ? "✅" : "-"}</td>
+          <td><b>${d.statut || ""}</b></td>
         </tr>`).join('');
     }
 
@@ -269,7 +299,6 @@
       document.getElementById("statsBureau").innerHTML = Object.entries(burMap).map(([n, c]) => `<li>${n} <b>${c}</b></li>`).join('');
     }
 
-    // AUTH & LOGOUT
     async function handleLogout() { await supabaseClient.auth.signOut(); sessionStorage.clear(); window.location.href = "login.html"; }
     function toggleVis(id) { const el = document.getElementById(id); el.type = el.type === "password" ? "text" : "password"; }
     function toggleDivisionSelect() { document.getElementById("divisionWrapper").style.display = (document.getElementById("userRole").value === "chef_division") ? "flex" : "none"; }
@@ -308,6 +337,7 @@
         </div>
         <h1>FICHE DE SUIVI DOSSIER</h1>
         <p><b>Agent :</b> ${d.nom_complet}</p>
+        <p><b>Matricule :</b> ${d.matricule || "N/A"}</p>
         <p><b>Objet :</b> ${d.objet}</p>
         <p><b>N° Enregistrement :</b> ${d.numero_enregistrement}</p>
         <p><b>Statut :</b> ${d.statut}</p>
