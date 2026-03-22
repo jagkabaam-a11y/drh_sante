@@ -13,12 +13,15 @@ function buildPayload(user, extra = {}) {
   const fields = [
     "objet",
     "nom_complet",
+    "matricule", // AJOUTÉ ICI
     "fonction",
     "grade",
     "structure",
     "telephone",
     "numero_enregistrement",
     "statut"
+  ];
+  }
   ];
 
   const payload = {};

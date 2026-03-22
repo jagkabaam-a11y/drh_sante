@@ -11,9 +11,10 @@
       max-width: 600px; margin: 20px auto; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
     }
     header { text-align: center; color: #000080; }
+    .container-relative { position: relative; } /* Pour l'autocomplétion */
     #autocompleteList { 
       border:1px solid #ccc; max-height:150px; overflow-y:auto; 
-      position:absolute; background:#fff; width:100%; max-width:550px; z-index: 100; 
+      position:absolute; background:#fff; width:100%; z-index: 100; 
     }
     #autocompleteList div { padding:10px; cursor:pointer; border-bottom: 1px solid #eee; }
     #autocompleteList div:hover { background:#f0f0f0; }
@@ -23,7 +24,6 @@
     #saveButton { background: #28a745; }
     #editButton { background: #ffc107; color: black; }
     
-    /* Style pour l'aperçu du document */
     #preview { 
       margin-top:15px; width: 100%; border:2px dashed #ddd; 
       border-radius: 8px; min-height: 80px; display: flex; 
@@ -44,22 +44,27 @@
   </header>
 
   <div class="form-container">
-    <label>Rechercher un dossier existant :</label>
-    <input type="text" id="searchInput" placeholder="Nom ou N° enregistrement...">
-    <div id="autocompleteList"></div>
+    <div class="container-relative">
+      <label>Rechercher un dossier existant :</label>
+      <input type="text" id="searchInput" placeholder="Nom, Matricule ou N° enregistrement...">
+      <div id="autocompleteList"></div>
+    </div>
 
     <form id="entreeForm">
-      <input id="numero_enregistrement" placeholder="N° enregistrement" required>
-      <input id="objet" placeholder="Objet / Motif du dossier" required>
+      <input id="numero_enregistrement" placeholder="N° d'enregistrement du courrier" required>
+      <input id="objet" placeholder="Objet / Motif du dossier (ex: Affectation, Mutation...)" required>
+      
       <input id="nom_complet" placeholder="Nom complet de l'agent" required>
-      <input id="fonction" placeholder="Fonction">
+      <input id="matricule" placeholder="N° Matricule de l'agent" required> 
+      <input id="fonction" placeholder="Fonction actuelle">
       <input id="grade" placeholder="Grade">
-      <input id="structure" placeholder="Structure / Province">
+      <input id="structure" placeholder="Structure / Province d'origine">
       <input id="telephone" placeholder="Téléphone de contact">
       
+      <label>Statut initial :</label>
       <select id="statut" required>
-        <option value="nouveau_dossier">Nouveau dossier</option>
-        <option value="ancien_dossier">Ancien dossier (Complément)</option>
+        <option value="Réceptionné">Réceptionné (Nouveau dossier)</option>
+        <option value="Complément">Ancien dossier (Complément de pièces)</option>
       </select>
 
       <label>Scanner le document (PDF ou Image) :</label>
@@ -71,11 +76,11 @@
 
       <div class="btn-group">
         <button type="submit" id="saveButton">Enregistrer le dossier et le scan</button>
-        <button type="button" id="editButton" style="display:none;">Mettre à jour (Données + Scan)</button>
+        <button type="button" id="editButton" style="display:none;">Mettre à jour le dossier</button>
       </div>
       
       <div style="text-align: center; margin-top: 25px; border-top: 1px solid #eee; padding-top: 15px;">
-        <a href="liste.html" style="color: #000080; font-weight: bold; text-decoration: none;"> Registre Général des dossiers</a>
+        <a href="liste.html" style="color: #000080; font-weight: bold; text-decoration: none;"> Retour sur Registre Général</a>
       </div>
     </form>
   </div>

@@ -19,7 +19,7 @@
       background-size: 40%; 
       background-blend-mode: overlay;
       margin: 0; padding: 20px;
-      display: none; /* Masqué tant que le rôle n'est pas vérifié */
+      display: none; 
     }
 
     .container { 
@@ -51,12 +51,14 @@
 
     .btn-save { width: 100%; background: var(--success); color: white; padding: 22px; font-size: 1.4em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; margin-top: 15px; }
     #loader { display: none; color: var(--primary); font-weight: bold; margin: 15px 0; text-align: center; }
+    
+    .step-box { margin-bottom: 15px; padding: 15px; border-left: 5px solid var(--gold); background: #f9f9f9; border-radius: 0 10px 10px 0; }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <button id="logoutBtn">Se Déconnecté </button>
+  <button id="logoutBtn">Déconnexion</button>
 
   <header>
     <p style="font-weight: bold; margin: 0; color: #555;">REPUBLIQUE DEMOCRATIQUE DU CONGO</p>
@@ -80,33 +82,53 @@
     </div>
 
     <form id="sortieForm">
-      <label><b>Date de sortie :</b></label>
+      <label><b>Date du mouvement :</b></label>
       <input type="date" id="date_sortie" required>
 
-      <label><b>Traitement final (Transmission) :</b></label>
-      <input type="text" id="traitement_transmission" placeholder="Précisez la destination du dossier..." required>
+      <div class="step-box">
+        <label><b>1. Sélectionner le Circuit :</b></label>
+        <select id="circuitSelect" required onchange="actualiserActions(this.value)">
+          <option value="">-- Choisir le circuit --</option>
+          <option value="SG">CIRCUIT SECRÉTARIAT GÉNÉRAL (SG)</option>
+          <option value="DRH">TRAITEMENT INTERNE DRH</option>
+        </select>
+      </div>
+
+      <div class="step-box" id="actionBox" style="display:none;">
+        <label><b>2. Choisir l'Action à faire :</b></label>
+        <select id="statut" required onchange="verifierSousEtape(this.value)">
+          <option value="">-- Choisir l'action --</option>
+        </select>
+      </div>
+
+      <div class="step-box" id="sousActionBox" style="display:none; background: #eef9f2; border-left-color: var(--success);">
+        <label><b>3. Étape après réception du document signé :</b></label>
+        <select id="sous_statut">
+          <option value="">-- Choisir l'orientation du dossier --</option>
+          <option value="Enregistrement pour notification">Enregistrement pour notification</option>
+          <option value="Classé pour archives">Classé définitivement pour archives</option>
+        </select>
+      </div>
+
+      <label><b>Note / Observation :</b></label>
+      <input type="text" id="traitement_transmission" placeholder="Précisez les détails ici..." required>
 
       <div class="file-upload-zone">
-        <label style="font-weight: bold; color: var(--primary);"> CHARGER LE SCAN DE SORTIE :</label>
+        <label style="font-weight: bold; color: var(--primary);"> CHARGER LE SCAN (Preuve ou Document signé) :</label>
         <input type="file" id="document_scanne" accept=".pdf, .jpg, .jpeg, .png">
-        
         <div id="previewContainer">
-          <p style="margin: 0 0 10px 0; font-size: 0.9em; color: #444;"> Aperçu du scan :</p>
           <img id="imagePreview" style="display:none;">
           <div id="pdfPreview" style="display:none; font-weight:bold; color:var(--primary);"> Document PDF prêt</div>
         </div>
       </div>
 
-      <label><b>Statut final :</b></label>
-      <select id="statut" required>
-        <option value="">-- Choisir --</option>
-        <option value="Résolu">Résolu</option>
-        <option value="Sortie">Sortie définitive</option>
-        <option value="Archivé">Archivé</option>
-      </select>
+      <div id="zoneLivraison" style="display:none; margin-top:15px; padding:15px; border:2px solid var(--success); border-radius:10px; background:#f0fff0;">
+        <label><b>N° de décharge ou Référence de remise :</b></label>
+        <input type="text" id="num_decharge" placeholder="Saisir la référence du retrait...">
+      </div>
 
-      <div id="loader">⏳ veuillez patientez svp...</div>
-      <button type="submit" class="btn-save" id="btnValider"> VALIDER ET CLÔTURER LE DOSSIER</button>
+      <div id="loader">⏳ Veuillez patienter svp...</div>
+      <button type="submit" class="btn-save" id="btnValider"> VALIDER ET CLÔTURER LE MOUVEMENT</button>
     </form>
   </div>
 </div>
@@ -115,77 +137,65 @@
 <script>
   const supabaseClient = supabase.createClient("https://ngsvrffgjksmmzyebptl.supabase.co", "sb_publishable_KLWH2wcZAqj3KHfkvzDTCg_oAEx9KS5");
 
-  // --- LOGIQUE DE SÉCURITÉ SYNCHRONISÉE ---
   function checkAuth() {
-    // Dans votre login, vous stockez sous la clé "role"
     const role = sessionStorage.getItem("role");
-    
-    if (!role) {
+    if (!role || (role !== "sortie" && role !== "admin")) {
       window.location.href = "login.html";
-      return;
-    }
-
-    // Seuls les rôles 'sortie' et 'admin' peuvent rester ici
-    if (role !== "sortie" && role !== "admin") {
-      alert("Accès refusé : Vous n'avez pas les droits pour cette page.");
-      window.location.href = "login.html";
-    } else {
-      document.body.style.display = "block"; // Affiche la page
-    }
+    } else { document.body.style.display = "block"; }
   }
-
   checkAuth();
 
   let recordId = null;
 
-  document.getElementById("logoutBtn").onclick = () => {
-    sessionStorage.clear();
-    window.location.href = "login.html";
-  };
+  function actualiserActions(circuit) {
+    const actionBox = document.getElementById("actionBox");
+    const actionSelect = document.getElementById("statut");
+    const sousActionBox = document.getElementById("sousActionBox");
+    
+    actionSelect.innerHTML = '<option value="">-- Choisir l\'action --</option>';
+    actionBox.style.display = circuit ? "block" : "none";
+    sousActionBox.style.display = "none";
 
-  // APERÇU DU FICHIER
-  document.getElementById("document_scanne").onchange = function(e) {
-    const file = e.target.files[0];
-    const previewContainer = document.getElementById("previewContainer");
-    const imgPrev = document.getElementById("imagePreview");
-    const pdfPrev = document.getElementById("pdfPreview");
+    if (circuit === "SG") {
+      actionSelect.innerHTML += `
+        <option value="Transmis au SG">Envoyer au Secrétariat Général (SG)</option>
+        <option value="Signé (Retour SG)">Réceptionner Retour du SG (Signé)</option>
+      `;
+    } else if (circuit === "DRH") {
+      actionSelect.innerHTML += `
+        <option value="Copié / Enregistré">Dossier traité en interne</option>
+        <option value="Livré à l'intéressé">Remise finale à l'agent</option>
+        <option value="Archivé">Archivage numérique final</option>
+      `;
+    }
+  }
 
-    if (file) {
-      previewContainer.style.display = "block";
-      if (file.type.startsWith("image/")) {
-        const reader = new FileReader();
-        reader.onload = (ev) => { imgPrev.src = ev.target.result; imgPrev.style.display = "inline-block"; pdfPrev.style.display = "none"; };
-        reader.readAsDataURL(file);
-      } else {
-        pdfPrev.style.display = "block"; imgPrev.style.display = "none";
-      }
-    } else { previewContainer.style.display = "none"; }
-  };
+  function verifierSousEtape(valeur) {
+    const sousActionBox = document.getElementById("sousActionBox");
+    const zoneLivraison = document.getElementById("zoneLivraison");
+    
+    // Affiche le sous-menu uniquement pour le retour SG
+    sousActionBox.style.display = (valeur === "Signé (Retour SG)") ? "block" : "none";
+    
+    // Affiche la décharge uniquement pour la livraison directe à l'intéressé
+    zoneLivraison.style.display = (valeur === "Livré à l'intéressé") ? "block" : "none";
+  }
 
-  // RECHERCHE
   document.getElementById("searchBtn").onclick = async () => {
     const query = document.getElementById("searchNom").value.trim();
     if (!query) return;
-
-    const { data } = await supabaseClient.from("problemes_agents")
-      .select("*")
-      .or(`nom_complet.ilike.%${query}%,numero_enregistrement.ilike.%${query}%`);
-
+    const { data } = await supabaseClient.from("problemes_agents").select("*").or(`nom_complet.ilike.%${query}%,numero_enregistrement.ilike.%${query}%`);
     const resDiv = document.getElementById("searchResults");
     resDiv.innerHTML = "";
-
     if (data && data.length > 0) {
       data.forEach(d => {
         const row = document.createElement("div");
         row.style = "background:#fff; padding:10px; border:1px solid #ddd; margin-bottom:5px; border-radius:8px; display:flex; justify-content:space-between; align-items:center;";
         row.innerHTML = `<span><b>${d.nom_complet}</b> (N° ${d.numero_enregistrement})</span> 
-                         <button type="button" style="background:var(--success); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;" 
-                         onclick="selectionner('${d.id}', '${d.nom_complet.replace(/'/g, "\\'")}', '${d.objet.replace(/'/g, "\\'")}', '${d.numero_enregistrement}')">SÉLECTIONNER</button>`;
+        <button type="button" style="background:var(--success); color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer;" onclick="selectionner('${d.id}', '${d.nom_complet.replace(/'/g, "\\'")}', '${d.objet ? d.objet.replace(/'/g, "\\'") : 'Sans objet'}', '${d.numero_enregistrement}')">SÉLECTIONNER</button>`;
         resDiv.appendChild(row);
       });
-    } else {
-      resDiv.innerHTML = "<p style='color:red;'>Aucun dossier trouvé.</p>";
-    }
+    } else { resDiv.innerHTML = "<p style='color:red;'>Aucun dossier trouvé.</p>"; }
   };
 
   function selectionner(id, nom, objet, num) {
@@ -197,48 +207,61 @@
     document.getElementById("searchResults").innerHTML = "";
   }
 
-  // VALIDATION FINALE AVEC UPLOAD
   document.getElementById("sortieForm").onsubmit = async (e) => {
     e.preventDefault();
-    if (!recordId) return;
-
-    const fileInput = document.getElementById("document_scanne");
-    const file = fileInput.files[0];
     const btn = document.getElementById("btnValider");
     const loader = document.getElementById("loader");
-
-    btn.disabled = true;
-    loader.style.display = "block";
+    btn.disabled = true; loader.style.display = "block";
 
     let finalUrl = null;
-
-    if (file) {
-      const fileName = `${Date.now()}_${file.name}`;
-      const { data: uploadData, error: uploadError } = await supabaseClient.storage.from('scans').upload(fileName, file);
-
-      if (uploadError) {
-        alert("Erreur Upload : " + uploadError.message);
-        btn.disabled = false; loader.style.display = "none"; return;
-      }
+    const fileInput = document.getElementById("document_scanne");
+    if (fileInput.files[0]) {
+      const file = fileInput.files[0];
+      const fileName = `SORTIE_${Date.now()}_${file.name}`;
+      await supabaseClient.storage.from('scans').upload(fileName, file);
       const { data: link } = supabaseClient.storage.from('scans').getPublicUrl(fileName);
       finalUrl = link.publicUrl;
     }
 
-    const { error } = await supabaseClient.from("problemes_agents").update({
-      date_sortie: document.getElementById("date_sortie").value,
-      traitement_transmission: document.getElementById("traitement_transmission").value.trim(),
-      statut: document.getElementById("statut").value,
-      scan_sortie_url: finalUrl 
-    }).eq("id", recordId);
+    const statutPrincipal = document.getElementById("statut").value;
+    const sousStatut = document.getElementById("sous_statut").value;
+    const noteInitiale = document.getElementById("traitement_transmission").value;
+    const numDecharge = document.getElementById("num_decharge").value;
+    
+    let statutFinal = statutPrincipal;
+    if (statutPrincipal === "Signé (Retour SG)" && sousStatut) {
+      statutFinal = "Signé - " + sousStatut;
+    }
 
-    if (error) {
-      alert("Erreur Base : " + error.message);
-      btn.disabled = false; loader.style.display = "none";
-    } else {
-      alert("✅ Archivage réussi ! Dossier clôturé.");
+    const updateData = {
+      date_sortie: document.getElementById("date_sortie").value,
+      traitement_transmission: numDecharge ? `${noteInitiale} (Réf décharge: ${numDecharge})` : noteInitiale,
+      statut: statutFinal,
+      scan_sortie_url: finalUrl
+    };
+
+    const { error } = await supabaseClient.from("problemes_agents").update(updateData).eq("id", recordId);
+    
+    if (!error) {
+      alert("Dossier mis à jour !");
       window.location.href = "liste.html";
+    } else {
+      alert("Erreur: " + error.message);
+      btn.disabled = false; loader.style.display = "none";
     }
   };
+
+  document.getElementById("document_scanne").onchange = function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById("imagePreview");
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (ev) => { preview.src = ev.target.result; preview.style.display = "block"; };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  document.getElementById("logoutBtn").onclick = () => { sessionStorage.clear(); window.location.href = "login.html"; };
 </script>
 </body>
 </html>
